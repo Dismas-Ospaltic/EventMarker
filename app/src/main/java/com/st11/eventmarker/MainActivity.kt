@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.st11.eventmarker.screens.components.HomeFAB
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.CalendarDay
@@ -60,9 +61,9 @@ class MainActivity : ComponentActivity() {
                     }
                 },
                 floatingActionButton = {
-//                    if (currentRoute == Screen.Home.route) { // Show FAB only on Home
-//                        HomeFAB(navController = navController)
-//                    }
+                    if (currentRoute == Screen.Home.route) { // Show FAB only on Home
+                        HomeFAB(navController = navController)
+                    }
 //                    if (currentRoute == Screen.Wishlist.route) { // Show FAB only on Home
 //                        WishlistFAB(navController = navController)
 //                    }
