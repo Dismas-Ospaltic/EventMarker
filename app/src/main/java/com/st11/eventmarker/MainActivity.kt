@@ -125,7 +125,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                             is Screen.Home -> {
                                 Icon(
                                     imageVector = FontAwesomeIcons.Solid.CalendarDay,
-                                    contentDescription = "money check",
+                                    contentDescription = "home page",
                                     tint = if (isSelected) selectedColor else unselectedColor,
                                     modifier = Modifier.size(24.dp)
                                 )

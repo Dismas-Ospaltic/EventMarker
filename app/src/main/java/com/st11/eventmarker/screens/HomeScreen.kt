@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,8 +40,7 @@ import compose.icons.fontawesomeicons.solid.Clipboard
 import compose.icons.fontawesomeicons.solid.Plus
 import compose.icons.fontawesomeicons.solid.Search
 import org.koin.androidx.compose.koinViewModel
-
-
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,6 +53,15 @@ fun HomeScreen(navController: NavController) {
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
     var selectedNotes by remember { mutableStateOf("") }
+
+
+
+    val configuration = LocalConfiguration.current
+    val columns = when {
+        configuration.screenWidthDp < 400 -> 2
+        configuration.screenWidthDp < 600 -> 3
+        else -> 4 // More columns for larger screens
+    }
 
     DynamicStatusBar(backgroundColor)
 
@@ -128,6 +138,19 @@ fun HomeScreen(navController: NavController) {
 //                .verticalScroll(rememberScrollState())
         ) {
 
+
+//            LazyColumn(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(
+//                        start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+//                        top = paddingValues.calculateTopPadding(),
+//                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+//                        bottom = paddingValues.calculateBottomPadding() + 80.dp
+//                    )
+//                    .background(color = colorResource(id = R.color.light_bg_color))
+//            ) {
+
             val cardDataReminder = listOf(
                 CardInfoReminder(
                     "Doctors appointment",
@@ -161,40 +184,183 @@ fun HomeScreen(navController: NavController) {
                 )
             )
 
-            val configuration = LocalConfiguration.current
-            val columns = when {
-                configuration.screenWidthDp < 400 -> 2
-                configuration.screenWidthDp < 600 -> 3
-                else -> 4 // More columns for larger screens
-            }
 
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(columns),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 300.dp) // Give a bounded height to prevent infinite height
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                userScrollEnabled = true // ❗ disable nested scroll
-            ) {
+//                    LazyVerticalGrid(
+//                        columns = GridCells.Fixed(columns),
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .heightIn(min = 300.dp)
+//                            .padding(horizontal = 12.dp, vertical = 8.dp),
+//                        userScrollEnabled = false // ✅ Important: Disable nested scroll inside LazyColumn
+//                    ) {
+//                        items(cardDataReminder.size) { index ->
+//                            val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+//                            ReminderCard(
+//                                priority = priority,
+//                                title = title,
+//                                date = date,
+//                                time = "$startTime - $endTime",
+//                                venue = venue,
+//                                onMoreNotesClick = {
+//                                    selectedNotes = extraNote
+//                                    showSheet = true
+//                                }
+//                            )
+//                        }
+//                    }
 
 
-                items(cardDataReminder.size) { index ->
-                    val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
-                    ReminderCard(
-                        priority = priority,
-                        title = title,
-                        date = date,
-                        time = "$startTime - $endTime",
-                        venue = venue,
-                        onMoreNotesClick = {
-                            selectedNotes = extraNote
-                            showSheet = true
-                        }
-                    )
-                }
-            }
 
+                   LazyVerticalGrid(
+                       columns = GridCells.Fixed(columns),
+                       modifier = Modifier
+                           .fillMaxWidth() // Important: fill width of its parent (LazyColumn item)
+                           .heightIn(min = 300.dp) // Provide a min height if needed, or let content define it
+                           .wrapContentHeight() // Allow height to wrap its content
+                           .padding(horizontal = 12.dp, vertical = 8.dp),
+                       userScrollEnabled = true // ✅ IMPORTANT: Disable scrolling for the inner LazyVerticalGrid
+                   ) {
+                       item(span = { GridItemSpan(maxLineSpan) }) {
+                           // Header 1
+
+                           Text(
+                               text = "Upcoming Reminders",
+                               color = Color.White,
+                               fontSize = 16.sp,
+                               fontWeight = FontWeight.Bold,
+                               modifier = Modifier
+                                   .fillMaxWidth()
+                                   .background(colorResource(id = R.color.persianGreen))
+                                   .padding(vertical = 12.dp, horizontal = 16.dp),
+                               textAlign = TextAlign.Center
+                           )
+
+                       }
+
+                       items(cardDataReminder.size) { index ->
+                           val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+                           ReminderCard(
+                               priority = priority,
+                               title = title,
+                               date = date,
+                               time = "$startTime - $endTime",
+                               venue = venue,
+                               onMoreNotesClick = {
+                                   selectedNotes = extraNote
+                                   showSheet = true
+                               }
+                           )
+                       }
+
+                       item(span = { GridItemSpan(maxLineSpan) }) {
+                           Text(
+                               text = "Past Date Reminders",
+                               color = Color.White,
+                               fontSize = 16.sp,
+                               fontWeight = FontWeight.Bold,
+                               modifier = Modifier
+                                   .fillMaxWidth()
+                                   .background(colorResource(id = R.color.persianGreen))
+                                   .padding(vertical = 12.dp, horizontal = 16.dp),
+                               textAlign = TextAlign.Center
+                           )
+                       }
+                       items(cardDataReminder.size) { index ->
+                           val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+                           ReminderCard(
+                               priority = priority,
+                               title = title,
+                               date = date,
+                               time = "$startTime - $endTime",
+                               venue = venue,
+                               onMoreNotesClick = {
+                                   selectedNotes = extraNote
+                                   showSheet = true
+                               }
+                           )
+                       }
+                   }
+
+//            LazyVerticalGrid(
+//                columns = GridCells.Fixed(columns),
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .heightIn(min = 300.dp) // Give a bounded height to prevent infinite height
+//                    .padding(horizontal = 12.dp, vertical = 8.dp),
+//                userScrollEnabled = true // ❗ disable nested scroll
+//            ) {
+//
+//
+//                items(cardDataReminder.size) { index ->
+//                    val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+//                    ReminderCard(
+//                        priority = priority,
+//                        title = title,
+//                        date = date,
+//                        time = "$startTime - $endTime",
+//                        venue = venue,
+//                        onMoreNotesClick = {
+//                            selectedNotes = extraNote
+//                            showSheet = true
+//                        }
+//                    )
+//                }
+//            }
+
+
+//            LazyVerticalGrid(
+//                columns = GridCells.Fixed(columns),
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .heightIn(min = 300.dp) // Give a bounded height to prevent infinite height
+//                    .padding(horizontal = 12.dp, vertical = 8.dp),
+//                userScrollEnabled = true // ❗ disable nested scroll
+//            ) {
+//
+//
+//                items(cardDataReminder.size) { index ->
+//                    val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+//                    ReminderCard(
+//                        priority = priority,
+//                        title = title,
+//                        date = date,
+//                        time = "$startTime - $endTime",
+//                        venue = venue,
+//                        onMoreNotesClick = {
+//                            selectedNotes = extraNote
+//                            showSheet = true
+//                        }
+//                    )
+//                }
+//            }
+//
+//                // Past Grid
+//                item {
+//                    LazyVerticalGrid(
+//                        columns = GridCells.Fixed(columns),
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .heightIn(min = 300.dp)
+//                            .padding(horizontal = 12.dp, vertical = 8.dp),
+//                        userScrollEnabled = false // ✅ Disable nested scroll
+//                    ) {
+//                        items(cardDataReminder.size) { index ->
+//                            val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+//                            ReminderCard(
+//                                priority = priority,
+//                                title = title,
+//                                date = date,
+//                                time = "$startTime - $endTime",
+//                                venue = venue,
+//                                onMoreNotesClick = {
+//                                    selectedNotes = extraNote
+//                                    showSheet = true
+//                                }
+//                            )
+//                        }
+//                    }
+//                }
 
         }
     }
@@ -295,8 +461,8 @@ fun ReminderCard(
                     color = Color(0xFF00796B) // Persian Green shade
                 )
                 Text(
-                    text = priority.uppercase(),
-                    fontSize = 14.sp,
+                    text = priority.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (priority.lowercase() == "high") Color.Red else Color(0xFF00796B)
                 )
