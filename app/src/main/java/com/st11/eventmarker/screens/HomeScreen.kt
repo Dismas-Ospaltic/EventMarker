@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +41,7 @@ import com.st11.eventmarker.R
 import com.st11.eventmarker.navigation.Screen
 import com.st11.eventmarker.screens.components.EditablePopup
 import com.st11.eventmarker.utils.DynamicStatusBar
+import com.st11.eventmarker.viewmodel.EventViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Clipboard
@@ -70,6 +72,14 @@ fun HomeScreen(navController: NavController) {
         configuration.screenWidthDp < 600 -> 3
         else -> 4 // More columns for larger screens
     }
+
+
+
+    val eventViewModel: EventViewModel = koinViewModel()
+    val events by eventViewModel.events.collectAsState()
+    val pastEvents by eventViewModel.pastEvents.collectAsState()
+
+
 
     DynamicStatusBar(backgroundColor)
 
@@ -189,7 +199,23 @@ fun HomeScreen(navController: NavController) {
                            .padding(horizontal = 12.dp, vertical = 8.dp),
                        userScrollEnabled = true // ✅ IMPORTANT: Disable scrolling for the inner LazyVerticalGrid
                    ) {
+
+                       // ✅ **Filter the list based on search query**
+                       val filteredEvent = events.filter {
+                           it.eventTitle.contains(searchQuery.value, ignoreCase = true) ||
+                            it.eventCategory.contains(searchQuery.value, ignoreCase = true)
+                       }
+
+
+                       // ✅ **Filter the list based on search query**
+                       val filteredPastEvent = pastEvents.filter {
+                           it.eventTitle.contains(searchQuery.value, ignoreCase = true) ||
+                                   it.eventCategory.contains(searchQuery.value, ignoreCase = true)
+                       }
+
+
                        item(span = { GridItemSpan(maxLineSpan) }) {
+
                            // Header 1
 
                            Text(
@@ -206,35 +232,98 @@ fun HomeScreen(navController: NavController) {
 
                        }
 
-                       items(cardDataReminder.size) { index ->
-                           val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
-                           ReminderCard(
-                               priority = priority,
-                               title = title,
-                               date = date,
-                               time = "$startTime - $endTime",
-                               venue = venue,
-                               onMoreNotesClick = {
-                                   selectedNotes = extraNote
-                                   showSheet = true
-                               },
-                               onEditClick = {
-                                   showDialog = true // Just trigger the flag
-                               }
-
-
-                           )
-                           if (showDialog) {
-                               EditablePopup(
-                                   initialText = selectedText,
-                                   onDismiss = { showDialog = false },
-                                   onSave = { newText ->
-                                       selectedText = newText
-                                       showDialog = false
+                       if (events.isEmpty()) {
+                           item {
+                               Box(
+                                   modifier = Modifier
+                                       .fillMaxWidth()
+                                       .padding(12.dp)
+                                       .heightIn(min = 200.dp), // Guarantees at least 200dp height
+                                   contentAlignment = Alignment.Center
+                               ) {
+                                   Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                       Icon(
+                                           imageVector = FontAwesomeIcons.Solid.Clipboard,
+                                           contentDescription = "No data",
+                                           tint = Color.Gray,
+                                           modifier = Modifier.size(64.dp)
+                                       )
+                                       Spacer(modifier = Modifier.height(8.dp))
+                                       Text(
+                                           text = "No data found, Click the plus Icon to add a customer/client",
+                                           color = Color.Gray,
+                                           fontSize = 18.sp,
+                                           fontWeight = FontWeight.Medium
+                                       )
                                    }
+                               }
+                           }
+                       }else if(filteredEvent.isEmpty()){
+ item{
+     // No data available after search
+     Box(
+         modifier = Modifier.fillMaxSize(),
+         contentAlignment = Alignment.Center
+     ) {
+         Text(
+             text = "No Results Found",
+             fontSize = 18.sp,
+             fontWeight = FontWeight.Bold,
+             color = Color.Gray
+         )
+     }
+ }
+                       }else{
+                           itemsIndexed(filteredEvent) { index, event ->
+                               ReminderCard(
+                                   priority = event.eventPriority,
+                                   title = event.eventTitle,
+                                   date = event.eventDate,
+                                   time = "${event.eventStartTime} - ${event.eventEndTime}",
+                                   venue = event.eventVenue,
+                                   onMoreNotesClick = {
+                                       selectedNotes = event.noteDescription
+                                       showSheet = true
+                                   },
+                                   onEditClick = {
+                                       showDialog = true // Just trigger the flag
+                                   }
+
+
                                )
+                               if (showDialog) {
+                                   EditablePopup(
+                                       initialText = selectedText,
+                                       onDismiss = { showDialog = false },
+                                       onSave = { newText ->
+                                           selectedText = newText
+                                           showDialog = false
+                                       }
+                                   )
+                               }
                            }
                        }
+
+//                       items(cardDataReminder.size) { index ->
+//                           val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+//                           ReminderCard(
+//                               priority = priority,
+//                               title = title,
+//                               date = date,
+//                               time = "$startTime - $endTime",
+//                               venue = venue,
+//                               onMoreNotesClick = {
+//                                   selectedNotes = extraNote
+//                                   showSheet = true
+//                               },
+//                               onEditClick = {
+//                                   showDialog = true // Just trigger the flag
+//                               }
+//
+//
+//                           )
+//
+//                       }
 
                        item(span = { GridItemSpan(maxLineSpan) }) {
                            Text(
@@ -249,20 +338,83 @@ fun HomeScreen(navController: NavController) {
                                textAlign = TextAlign.Center
                            )
                        }
-                       items(cardDataReminder.size) { index ->
-                           val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+
+
+                       if (pastEvents.isEmpty()) {
+                           item {
+                               Box(
+                                   modifier = Modifier
+                                       .fillMaxWidth()
+                                       .padding(12.dp)
+                                       .heightIn(min = 200.dp), // Guarantees at least 200dp height
+                                   contentAlignment = Alignment.Center
+                               ) {
+                                   Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                       Icon(
+                                           imageVector = FontAwesomeIcons.Solid.Clipboard,
+                                           contentDescription = "No data",
+                                           tint = Color.Gray,
+                                           modifier = Modifier.size(64.dp)
+                                       )
+                                       Spacer(modifier = Modifier.height(8.dp))
+                                       Text(
+                                           text = "No data found, Click the plus Icon to add a customer/client",
+                                           color = Color.Gray,
+                                           fontSize = 18.sp,
+                                           fontWeight = FontWeight.Medium
+                                       )
+                                   }
+                               }
+                           }
+                       }else if(filteredPastEvent.isEmpty()) {
+                           item {
+                               // No data available after search
+                               Box(
+                                   modifier = Modifier.fillMaxSize(),
+                                   contentAlignment = Alignment.Center
+                               ) {
+                                   Text(
+                                       text = "No Results Found",
+                                       fontSize = 18.sp,
+                                       fontWeight = FontWeight.Bold,
+                                       color = Color.Gray
+                                   )
+                               }
+                           }
+                       }else{
+                           itemsIndexed(filteredPastEvent) { index, event ->
+
                            PastReminderCard(
-                               priority = priority,
-                               title = title,
-                               date = date,
-                               time = "$startTime - $endTime",
-                               venue = venue,
+                               priority = event.eventPriority,
+                               title = event.eventTitle,
+                               date = event.eventDate,
+                               time = "${event.eventStartTime} - ${event.eventEndTime}",
+                               venue = event.eventVenue,
                                onMoreNotesClick = {
-                                   selectedNotes = extraNote
+                                   selectedNotes = event.noteDescription
                                    showSheet = true
-                               },
+                               }
                            )
+                           }
+
                        }
+
+
+
+//                       items(cardDataReminder.size) { index ->
+//                           val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
+//                           PastReminderCard(
+//                               priority = priority,
+//                               title = title,
+//                               date = date,
+//                               time = "$startTime - $endTime",
+//                               venue = venue,
+//                               onMoreNotesClick = {
+//                                   selectedNotes = extraNote
+//                                   showSheet = true
+//                               },
+//                           )
+//                       }
                    }
 
         }

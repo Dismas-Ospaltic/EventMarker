@@ -34,4 +34,10 @@ class EventRepository(private val eventDao: EventDao) {
     }
 
 
+    init {
+        getAllPastDateEvents()
+        getAllUpcomingDateEvents()
+    }
+
+
 }

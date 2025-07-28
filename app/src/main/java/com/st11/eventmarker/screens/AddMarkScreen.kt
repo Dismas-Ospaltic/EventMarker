@@ -29,16 +29,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.st11.eventmarker.R
+import com.st11.eventmarker.model.EventEntity
 import com.st11.eventmarker.utils.DatePickerField
 import com.st11.eventmarker.utils.DynamicStatusBar
 import com.st11.eventmarker.utils.TimePickerField
+import com.st11.eventmarker.viewmodel.EventViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Clipboard
 import compose.icons.fontawesomeicons.solid.Search
 import org.koin.androidx.compose.koinViewModel
-
-
+import kotlin.random.Random
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,6 +60,8 @@ fun AddMarkScreen(navController: NavController) {
     var endTime by remember { mutableStateOf("") }
 
     val context = LocalContext.current
+
+    val eventViewModel: EventViewModel = koinViewModel()
 
     DynamicStatusBar(backgroundColor)
 
@@ -162,7 +165,7 @@ fun AddMarkScreen(navController: NavController) {
             OutlinedTextField(
                 value = eventTitle,
                 onValueChange = { eventTitle = it },
-                label = { Text("Event Title") },
+                label = { Text("Event Title *") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
@@ -202,7 +205,7 @@ fun AddMarkScreen(navController: NavController) {
                     value = priority,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Event Priority") },
+                    label = { Text("Event Priority *") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(),
@@ -285,17 +288,17 @@ fun AddMarkScreen(navController: NavController) {
 
 
             // ✅ Date Picker
-            DatePickerField(label = "Select Date") { selected ->
+            DatePickerField(label = "Select Date *") { selected ->
                 date = selected
             }
 
             // ✅ Start Time Picker
-            TimePickerField(label = "Start Time") { selected ->
+            TimePickerField(label = "Start Time *") { selected ->
                 startTime = selected
             }
 
             // ✅ End Time Picker
-            TimePickerField(label = "End Time") { selected ->
+            TimePickerField(label = "End Time *") { selected ->
                 endTime = selected
             }
 
@@ -325,8 +328,22 @@ fun AddMarkScreen(navController: NavController) {
             // ✅ Save Button
             Button(
                 onClick = {
-                    if (category.isNotEmpty() && date.isNotEmpty() && startTime.isNotEmpty()) {
-                        Toast.makeText(context, "all required fields okay", Toast.LENGTH_SHORT).show()
+                    if (eventTitle.isNotEmpty() && date.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
+
+                    eventViewModel.insertEvent(
+                        EventEntity(
+                        eventDate = date,
+                         eventStartTime = startTime,
+                        eventEndTime = endTime,
+                        eventTitle = eventTitle,
+                        eventVenue = eventVenue,
+                        eventPriority = priority,
+                         eventId = generateSixDigitRandomNumber().toString(),
+                            eventCategory = category
+                        )
+                    )
+
+
                     } else {
                         Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
                     }
@@ -349,4 +366,8 @@ fun AddMarkScreen(navController: NavController) {
 @Composable
 fun AddMarkScreenPreview() {
     AddMarkScreen(navController = rememberNavController())
+}
+
+fun generateSixDigitRandomNumber(): Int {
+    return Random.nextInt(1000000, 100000000)  // Generates a random number between 100000 (inclusive) and 1000000 (exclusive)
 }
