@@ -48,6 +48,8 @@ fun AddMarkScreen(navController: NavController) {
 
     val backgroundColor = colorResource(id = R.color.seina)
     var eventTitle by remember { mutableStateOf("") }
+    var eventVenue by remember { mutableStateOf("") }
+    var eventDescription by remember { mutableStateOf("") }
     var priority by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     var category by remember { mutableStateOf("") }
@@ -174,6 +176,23 @@ fun AddMarkScreen(navController: NavController) {
             )
 
 
+                OutlinedTextField(
+                    value = eventVenue,
+                    onValueChange = { eventVenue = it },
+                    label = { Text("Venue e.g medina hall") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        focusedBorderColor = backgroundColor,
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = backgroundColor,
+                        cursorColor = backgroundColor
+                    ),
+                    singleLine = true,
+                )
+
+
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -281,6 +300,27 @@ fun AddMarkScreen(navController: NavController) {
             }
 
 
+                OutlinedTextField(
+                    value = eventDescription,
+                    onValueChange = { eventDescription = it },
+                    label = { Text("short Notes") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 100.dp, max = 200.dp) // Adjust height for ~4 lines
+                        .verticalScroll(rememberScrollState()),
+
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        focusedBorderColor = backgroundColor,
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = backgroundColor,
+                        cursorColor = backgroundColor
+                    ),
+                    singleLine = false,
+                    maxLines = 4
+                )
+
 
             // ✅ Save Button
             Button(
@@ -293,18 +333,16 @@ fun AddMarkScreen(navController: NavController) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00796B))
+                    .height(48.dp),
+                    shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.persianGreen))
             ) {
-                Text("Save Event", color = Color.White, fontSize = 16.sp)
+                Text("Add to calender", color = Color.White, fontSize = 16.sp)
             }
         }
         }
     }
 }
-
-
-
 
 
 @Preview(showBackground = true)
