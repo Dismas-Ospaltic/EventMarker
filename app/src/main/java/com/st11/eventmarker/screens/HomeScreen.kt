@@ -140,14 +140,12 @@ fun HomeScreen(navController: NavController) {
                     start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
                     top = paddingValues.calculateTopPadding(),
                     end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-                    bottom = paddingValues.calculateBottomPadding() + 80.dp
+                    bottom = paddingValues.calculateBottomPadding() + 78.dp
                 )
                 .background(color = colorResource(id = R.color.light_bg_color))
 //                .verticalScroll(rememberScrollState())
         ) {
 
-
-//
 
             val cardDataReminder = listOf(
                 CardInfoReminder(
@@ -181,34 +179,6 @@ fun HomeScreen(navController: NavController) {
                     "Bring all reports and X-ray images."
                 )
             )
-
-
-
-//                    LazyVerticalGrid(
-//                        columns = GridCells.Fixed(columns),
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .heightIn(min = 300.dp)
-//                            .padding(horizontal = 12.dp, vertical = 8.dp),
-//                        userScrollEnabled = false // ✅ Important: Disable nested scroll inside LazyColumn
-//                    ) {
-//                        items(cardDataReminder.size) { index ->
-//                            val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
-//                            ReminderCard(
-//                                priority = priority,
-//                                title = title,
-//                                date = date,
-//                                time = "$startTime - $endTime",
-//                                venue = venue,
-//                                onMoreNotesClick = {
-//                                    selectedNotes = extraNote
-//                                    showSheet = true
-//                                }
-//                            )
-//                        }
-//                    }
-
-
 
                    LazyVerticalGrid(
                        columns = GridCells.Fixed(columns),
@@ -274,14 +244,14 @@ fun HomeScreen(navController: NavController) {
                                fontWeight = FontWeight.Bold,
                                modifier = Modifier
                                    .fillMaxWidth()
-                                   .background(colorResource(id = R.color.persianGreen))
+                                   .background(colorResource(id = R.color.charcoal))
                                    .padding(vertical = 12.dp, horizontal = 16.dp),
                                textAlign = TextAlign.Center
                            )
                        }
                        items(cardDataReminder.size) { index ->
                            val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
-                           ReminderCard(
+                           PastReminderCard(
                                priority = priority,
                                title = title,
                                date = date,
@@ -291,13 +261,9 @@ fun HomeScreen(navController: NavController) {
                                    selectedNotes = extraNote
                                    showSheet = true
                                },
-                               onEditClick = {
-
-                               }
                            )
                        }
                    }
-
 
         }
     }
@@ -360,7 +326,7 @@ fun ReminderCard(
     var isMenuExpanded by remember { mutableStateOf(false) }
     val cardColor = when (priority.lowercase()) {
         "high" -> Color(0xFFFFE5E5) // Light red
-        "medium" -> Color(0xFFFFF8E1) // Light yellow
+        "low" -> Color(0xFFFFF8E1) // Light yellow
         else -> Color(0xFFE8F5E9) // Light green
     }
 
@@ -448,6 +414,76 @@ fun ReminderCard(
     }
 }
 
+//past date reminder cards
+@Composable
+fun PastReminderCard(
+    priority: String, // "high" or "low"
+    title: String,
+    date: String,
+    time: String,
+    venue: String,
+    onMoreNotesClick: () -> Unit
+) {
+
+
+    Card(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .shadow(8.dp, RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Reminder",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF00796B) // Persian Green shade
+                )
+            }
+            Text(
+                text = "priority: " + priority.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(
+                        Locale.getDefault()
+                    ) else it.toString()
+                },
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (priority.lowercase() == "high") Color.Red else Color(0xFF00796B)
+            )
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black
+            )
+            Text(text = "Date: $date", fontSize = 14.sp, color = Color.Gray)
+            Text(text = "Time: $time", fontSize = 14.sp, color = Color.Gray)
+            Text(text = "Venue: $venue", fontSize = 14.sp, color = Color.Gray)
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(
+                onClick = onMoreNotesClick,
+                modifier = Modifier.align(Alignment.End),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00796B))
+            ) {
+                Text(text = "More Notes", color = Color.White)
+            }
+        }
+    }
+}
 
 
 
