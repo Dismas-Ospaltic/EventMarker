@@ -1,18 +1,25 @@
 package com.st11.eventmarker.screens
 
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,7 +29,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.st11.eventmarker.R
+import com.st11.eventmarker.utils.DatePickerField
 import com.st11.eventmarker.utils.DynamicStatusBar
+import com.st11.eventmarker.utils.TimePickerField
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Clipboard
@@ -36,70 +45,265 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddMarkScreen(navController: NavController) {
 
-    val searchQuery = remember { mutableStateOf("") }
+
     val backgroundColor = colorResource(id = R.color.seina)
+    var eventTitle by remember { mutableStateOf("") }
+    var priority by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var category by remember { mutableStateOf("") }
+    var expanded01 by remember { mutableStateOf(false) }
+    var date by remember { mutableStateOf("") }
+    var startTime by remember { mutableStateOf("") }
+    var endTime by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
 
     DynamicStatusBar(backgroundColor)
 
+
+    val priorityType = listOf(
+        "high", "low"
+    )
+
+
+    val categoryType = listOf(
+        "other",
+        "Doctor's Appointment",
+        "Gym Session",
+        "Yoga Class",
+        "Meeting",
+        "Work Deadline",
+        "Project Review",
+        "Conference",
+        "Team Standup",
+        "Training Session",
+        "Workshop",
+        "Interview",
+        "Personal Errand",
+        "Family Event",
+        "Birthday",
+        "Anniversary",
+        "Social Gathering",
+        "Dinner Plan",
+        "Vacation",
+        "Travel",
+        "Flight Schedule",
+        "Hotel Check-in",
+        "School Event",
+        "Parent-Teacher Meeting",
+        "Exam",
+        "Class",
+        "Webinar",
+        "Religious Event",
+        "Prayer Time",
+        "Medication Reminder",
+        "Bill Payment",
+        "Subscription Renewal",
+        "Shopping",
+        "Car Service",
+        "Pet Care",
+        "Cleaning Schedule",
+        "House Maintenance",
+        "Fitness Challenge",
+        "Sports Practice",
+        "Game Night",
+        "Concert",
+        "Movie Night",
+        "Networking Event"
+    )
+
+
     Scaffold(
-        topBar = {
-            TopAppBar(
+
+                topBar = {
+            CenterAlignedTopAppBar(
                 title = { Text("Manage Reminders", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = backgroundColor
                 )
             )
-        }
+        },
     ) {  paddingValues ->
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(
                     top = paddingValues.calculateTopPadding(),
-                    bottom = 0.dp
+                    bottom = paddingValues.calculateBottomPadding(),
+                    start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+                    end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
                 )
                 .background(color = colorResource(id = R.color.light_bg_color))
+               .verticalScroll(rememberScrollState())
         ) {
 
-            // Search Field
-            TextField(
-                value = searchQuery.value,
-                onValueChange = { searchQuery.value = it },
-                placeholder = { Text(text = "Search...") },
-                leadingIcon = {
-                    Icon(
-                        imageVector = FontAwesomeIcons.Solid.Search,
-                        contentDescription = "Search Icon",
-                        tint = Color.Gray,
-                        modifier = Modifier.size(24.dp)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(
+                        start = paddingValues.calculateStartPadding(LocalLayoutDirection.current) + 15.dp,
+                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + 15.dp,
+                        bottom = paddingValues.calculateBottomPadding() + 25.dp
                     )
+                  ,
+                verticalArrangement = Arrangement.spacedBy(12.dp) // sets 12dp vertical space between items
+            ) {
+            OutlinedTextField(
+                value = eventTitle,
+                onValueChange = { eventTitle = it },
+                label = { Text("Event Title") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                    focusedBorderColor = backgroundColor,
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = backgroundColor,
+                    cursorColor = backgroundColor
+                ),
+                singleLine = true,
+            )
+
+
+
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = priority,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Event Priority") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        focusedBorderColor = backgroundColor,
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = backgroundColor,
+                        cursorColor = backgroundColor
+                    )
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .background(Color.White) // ✅ White background for the dropdown menu
+                ) {
+                    priorityType.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption, color = Color.Black) }, // ✅ Black text
+                            onClick = {
+                                priority = selectionOption
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+
+            ExposedDropdownMenuBox(
+                expanded = expanded01,
+                onExpandedChange = { expanded01 = !expanded01 }
+            ) {
+                OutlinedTextField(
+                    value = category,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Category") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded01)
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        focusedBorderColor = backgroundColor,
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = backgroundColor,
+                        cursorColor = backgroundColor
+                    )
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded01,
+                    onDismissRequest = { expanded01 = false },
+                    modifier = Modifier
+                        .background(Color.White) // ✅ White background for the dropdown menu
+                ) {
+                    categoryType.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption, color = Color.Black) }, // ✅ Black text
+                            onClick = {
+                                category = selectionOption
+                                expanded01 = false
+                            }
+                        )
+                    }
+                }
+            }
+
+
+            // ✅ Date Picker
+            DatePickerField(label = "Select Date") { selected ->
+                date = selected
+            }
+
+            // ✅ Start Time Picker
+            TimePickerField(label = "Start Time") { selected ->
+                startTime = selected
+            }
+
+            // ✅ End Time Picker
+            TimePickerField(label = "End Time") { selected ->
+                endTime = selected
+            }
+
+
+
+            // ✅ Save Button
+            Button(
+                onClick = {
+                    if (category.isNotEmpty() && date.isNotEmpty() && startTime.isNotEmpty()) {
+                        Toast.makeText(context, "all required fields okay", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    cursorColor = Color.Black,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-
-
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00796B))
+            ) {
+                Text("Save Event", color = Color.White, fontSize = 16.sp)
+            }
+        }
         }
     }
 }
+
+
 
 
 
