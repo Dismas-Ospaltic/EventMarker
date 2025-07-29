@@ -233,7 +233,7 @@ fun HomeScreen(navController: NavController) {
                        }
 
                        if (events.isEmpty()) {
-                           item {
+                           item(span = { GridItemSpan(maxLineSpan) }) {
                                Box(
                                    modifier = Modifier
                                        .fillMaxWidth()
@@ -259,7 +259,7 @@ fun HomeScreen(navController: NavController) {
                                }
                            }
                        }else if(filteredEvent.isEmpty()){
- item{
+ item(span = { GridItemSpan(maxLineSpan) }){
      // No data available after search
      Box(
          modifier = Modifier.fillMaxSize(),
@@ -274,23 +274,55 @@ fun HomeScreen(navController: NavController) {
      }
  }
                        }else{
-                           itemsIndexed(filteredEvent) { index, event ->
+//                           itemsIndexed(filteredEvent) { index, event ->
+//                               ReminderCard(
+//                                   priority = event.eventPriority,
+//                                   title = event.eventTitle,
+//                                   date = event.eventDate,
+//                                   time = "${event.eventStartTime} - ${event.eventEndTime}",
+//                                   venue = event.eventVenue,
+//                                   onMoreNotesClick = {
+//                                       selectedNotes = event.noteDescription
+//                                       showSheet = true
+//                                   },
+//                                   onEditClick = {
+//                                       showDialog = true // Just trigger the flag
+//                                   }
+//
+//
+//                               )
+//                               if (showDialog) {
+//                                   EditablePopup(
+//                                       initialText = selectedText,
+//                                       onDismiss = { showDialog = false },
+//                                       onSave = { newText ->
+//                                           selectedText = newText
+//                                           showDialog = false
+//                                       }
+//                                   )
+//                               }
+//                           }
+
+
+                           items(filteredEvent.size){
+                             val (priority, title, date, startTime, endTime ,venue, extraNote) = filteredEvent[it]
+
                                ReminderCard(
-                                   priority = event.eventPriority,
-                                   title = event.eventTitle,
-                                   date = event.eventDate,
-                                   time = "${event.eventStartTime} - ${event.eventEndTime}",
-                                   venue = event.eventVenue,
-                                   onMoreNotesClick = {
-                                       selectedNotes = event.noteDescription
-                                       showSheet = true
-                                   },
-                                   onEditClick = {
-                                       showDialog = true // Just trigger the flag
-                                   }
+                               priority = priority.toString(),
+                               title = title.toString(),
+                               date = date,
+                               time = "$startTime - $endTime",
+                               venue = venue,
+                               onMoreNotesClick = {
+                                   selectedNotes = extraNote
+                                   showSheet = true
+                               },
+                               onEditClick = {
+                                   showDialog = true // Just trigger the flag
+                               }
 
 
-                               )
+                           )
                                if (showDialog) {
                                    EditablePopup(
                                        initialText = selectedText,
@@ -301,7 +333,12 @@ fun HomeScreen(navController: NavController) {
                                        }
                                    )
                                }
+
                            }
+
+
+
+
                        }
 
 //                       items(cardDataReminder.size) { index ->
@@ -341,7 +378,7 @@ fun HomeScreen(navController: NavController) {
 
 
                        if (pastEvents.isEmpty()) {
-                           item {
+                           item(span = { GridItemSpan(maxLineSpan) }) {
                                Box(
                                    modifier = Modifier
                                        .fillMaxWidth()
@@ -367,7 +404,7 @@ fun HomeScreen(navController: NavController) {
                                }
                            }
                        }else if(filteredPastEvent.isEmpty()) {
-                           item {
+                           item(span = { GridItemSpan(maxLineSpan) }) {
                                // No data available after search
                                Box(
                                    modifier = Modifier.fillMaxSize(),
@@ -382,20 +419,37 @@ fun HomeScreen(navController: NavController) {
                                }
                            }
                        }else{
-                           itemsIndexed(filteredPastEvent) { index, event ->
 
-                           PastReminderCard(
-                               priority = event.eventPriority,
-                               title = event.eventTitle,
-                               date = event.eventDate,
-                               time = "${event.eventStartTime} - ${event.eventEndTime}",
-                               venue = event.eventVenue,
-                               onMoreNotesClick = {
-                                   selectedNotes = event.noteDescription
-                                   showSheet = true
-                               }
-                           )
+//                               itemsIndexed(filteredPastEvent) { index, pastevent ->
+//                                   PastReminderCard(
+//                                       priority = pastevent.eventPriority,
+//                                       title = pastevent.eventTitle,
+//                                       date = pastevent.eventDate,
+//                                       time = "${pastevent.eventStartTime} - ${pastevent.eventEndTime}",
+//                                       venue = pastevent.eventVenue,
+//                                       onMoreNotesClick = {
+//                                           selectedNotes = ${pastevent.noteDescription}
+//                                           showSheet = true
+//                                       }
+//                                   )
+//                               }
+                           items(filteredPastEvent.size){
+                                   index ->
+                                   val (title, date, type, priority, startTime, endTime, venue, extraNote) = filteredPastEvent[index]
+
+                               PastReminderCard(
+                                   title = title.toString(),
+                                   priority = priority,
+                                   date = date,
+                                   time = "$startTime - $endTime",
+                                   venue = venue,
+                                   onMoreNotesClick = {
+                                       selectedNotes = extraNote
+                                       showSheet = true
+                                   },
+                               )
                            }
+
 
                        }
 
@@ -416,6 +470,9 @@ fun HomeScreen(navController: NavController) {
 //                           )
 //                       }
                    }
+
+
+
 
         }
     }

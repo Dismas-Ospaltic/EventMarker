@@ -21,10 +21,16 @@ class  EventViewModel(private val eventRepository: EventRepository) : ViewModel(
     private val _pastEvents = MutableStateFlow<List<EventEntity>>(emptyList())
     val pastEvents: StateFlow<List<EventEntity>> = _pastEvents
 
+
+    init {
+        getAllEvents()
+        getAllPastEvents()
+    }
+
 //    private val _isLoading = MutableStateFlow(true)
 //    val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun getAllEvents(userId: String) {
+    private fun getAllEvents() {
         viewModelScope.launch {
             eventRepository.getAllUpcomingDateEvents().collectLatest { eventList ->
                 _events.value = eventList
@@ -32,7 +38,7 @@ class  EventViewModel(private val eventRepository: EventRepository) : ViewModel(
         }
     }
 
-    fun getAllPastEvents(userId: String) {
+    private fun getAllPastEvents() {
         viewModelScope.launch {
             eventRepository.getAllPastDateEvents().collectLatest { pastEventList ->
                 _pastEvents.value = pastEventList

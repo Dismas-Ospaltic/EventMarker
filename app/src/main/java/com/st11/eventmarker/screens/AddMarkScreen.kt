@@ -55,7 +55,8 @@ fun AddMarkScreen(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
     var category by remember { mutableStateOf("") }
     var expanded01 by remember { mutableStateOf(false) }
-    var date by remember { mutableStateOf("") }
+//    var date by remember { mutableStateOf("") }
+    var selectedDate by remember { mutableStateOf("") }
     var startTime by remember { mutableStateOf("") }
     var endTime by remember { mutableStateOf("") }
 
@@ -288,9 +289,12 @@ fun AddMarkScreen(navController: NavController) {
 
 
             // ✅ Date Picker
-            DatePickerField(label = "Select Date *") { selected ->
-                date = selected
-            }
+//            DatePickerField(label = "Select Date *") { date ->
+//                date = date
+//            }
+                DatePickerField(label = "Select a date") { date ->
+                    selectedDate = date
+                }
 
             // ✅ Start Time Picker
             TimePickerField(label = "Start Time *") { selected ->
@@ -328,11 +332,11 @@ fun AddMarkScreen(navController: NavController) {
             // ✅ Save Button
             Button(
                 onClick = {
-                    if (eventTitle.isNotEmpty() && date.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
+                    if (eventTitle.isNotEmpty() && selectedDate.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
 
                     eventViewModel.insertEvent(
                         EventEntity(
-                        eventDate = date,
+                        eventDate = selectedDate,
                          eventStartTime = startTime,
                         eventEndTime = endTime,
                         eventTitle = eventTitle,
@@ -342,6 +346,7 @@ fun AddMarkScreen(navController: NavController) {
                             eventCategory = category
                         )
                     )
+                     navController.popBackStack()
 
 
                     } else {
