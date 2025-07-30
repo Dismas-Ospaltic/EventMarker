@@ -1,7 +1,11 @@
 package com.st11.eventmarker.screens
 
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.st11.eventmarker.R
@@ -33,11 +38,13 @@ import com.st11.eventmarker.model.EventEntity
 import com.st11.eventmarker.utils.DatePickerField
 import com.st11.eventmarker.utils.DynamicStatusBar
 import com.st11.eventmarker.utils.TimePickerField
+import com.st11.eventmarker.utils.addEventToCalendar
 import com.st11.eventmarker.viewmodel.EventViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Clipboard
 import compose.icons.fontawesomeicons.solid.Search
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import kotlin.random.Random
 
@@ -65,6 +72,95 @@ fun AddMarkScreen(navController: NavController) {
     val eventViewModel: EventViewModel = koinViewModel()
 
     DynamicStatusBar(backgroundColor)
+
+    //user calender permission
+    val permissionState = remember { mutableStateOf(false) }
+    var showPermissionDialog by remember { mutableStateOf(true) }
+
+    // Check if permission is already granted
+    LaunchedEffect(Unit) {
+        val hasReadPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.READ_CALENDAR
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val hasWritePermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.WRITE_CALENDAR
+        ) == PackageManager.PERMISSION_GRANTED
+
+        permissionState.value = hasReadPermission && hasWritePermission
+
+        // If not granted, show dialog once
+//        if (!permissionState.value) {
+//            showPermissionDialog = true
+//        }
+        if (!permissionState.value) {
+            delay(300) // Add delay to prevent flicker
+            showPermissionDialog = true
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions[Manifest.permission.READ_CALENDAR] == true &&
+                permissions[Manifest.permission.WRITE_CALENDAR] == true
+        permissionState.value = allGranted
+
+        if (!allGranted) {
+            Toast.makeText(context, "Calendar permissions denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+//
+//    val permissionLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.RequestMultiplePermissions()
+//    ) { permissions ->
+//        val allGranted = permissions[Manifest.permission.READ_CALENDAR] == true &&
+//                permissions[Manifest.permission.WRITE_CALENDAR] == true
+//
+//        permissionState.value = allGranted
+//        if (!allGranted) {
+//            Toast.makeText(context, "Calendar permissions denied", Toast.LENGTH_SHORT).show()
+//        }
+//    }
+
+
+
+        // Show rationale dialog before requesting
+//        if (showPermissionDialog) {
+    if (showPermissionDialog && !permissionState.value) {
+            AlertDialog(
+                onDismissRequest = { showPermissionDialog = false },
+                title = { Text("Calendar Access Needed") },
+                text = { Text("We want to access your calendar to mark this event on your calendar.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showPermissionDialog = false
+//                    permissionLauncher.launch(Manifest.permission.WRITE_CALENDAR)
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.READ_CALENDAR,
+                                Manifest.permission.WRITE_CALENDAR
+                            )
+                        )
+                    }) {
+                        Text("Allow")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showPermissionDialog = false
+                    }) {
+                        Text("Deny")
+                    }
+                }
+            )
+        }
+
+
+//// Ask for permission once when the Composable is launched
+//    LaunchedEffect(Unit) {
+//        permissionLauncher.launch(Manifest.permission.WRITE_CALENDAR)
+//    }
 
 
     val priorityType = listOf(
@@ -346,6 +442,20 @@ fun AddMarkScreen(navController: NavController) {
                             eventCategory = category
                         )
                     )
+                        // ✅ Add to calendar only if permission granted
+                        if (permissionState.value) {
+                            addEventToCalendar(
+                                context = context,
+                                title = eventTitle,
+                                date = selectedDate,
+                                startTime = startTime,
+                                endTime = endTime,
+                                location = eventVenue
+                            )
+                        } else {
+                            Toast.makeText(context, "Event saved but calendar permission not granted", Toast.LENGTH_SHORT).show()
+                        }
+
                      navController.popBackStack()
 
 
