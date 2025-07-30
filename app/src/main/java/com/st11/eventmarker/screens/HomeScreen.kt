@@ -305,16 +305,16 @@ fun HomeScreen(navController: NavController) {
 
 
                            items(filteredEvent.size){
-                             val (priority, title, date, startTime, endTime ,venue, extraNote) = filteredEvent[it]
-
+//                             val (priority, title, date, startTime, endTime ,venue, extraNote) = filteredEvent[it]
+                               val(id,eventDate, eventStartTime, eventEndTime, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription, eventId, timestamp) = filteredEvent[it]
                                ReminderCard(
-                               priority = priority.toString(),
-                               title = title.toString(),
-                               date = date,
-                               time = "$startTime - $endTime",
-                               venue = venue,
+                               priority = eventPriority.toString(),
+                               title = eventTitle.toString(),
+                               date = eventDate,
+                               time = "$eventStartTime - $eventEndTime",
+                                   venue = if (eventVenue.isNullOrBlank()) "no venue added" else eventVenue,
                                onMoreNotesClick = {
-                                   selectedNotes = extraNote
+                                   selectedNotes = if (noteDescription.isNullOrBlank()) "no notes Added" else noteDescription
                                    showSheet = true
                                },
                                onEditClick = {
@@ -434,19 +434,19 @@ fun HomeScreen(navController: NavController) {
 //                                   )
 //                               }
                            items(filteredPastEvent.size){
-                                   index ->
-                                   val (title, date, type, priority, startTime, endTime, venue, extraNote) = filteredPastEvent[index]
+                               val(id,eventDate, eventStartTime, eventEndTime, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription, eventId, timestamp) = filteredPastEvent[it]
 
                                PastReminderCard(
-                                   title = title.toString(),
-                                   priority = priority,
-                                   date = date,
-                                   time = "$startTime - $endTime",
-                                   venue = venue,
+                                   priority = eventPriority.toString(),
+                                   title = eventTitle.toString(),
+                                   date = eventDate,
+                                   time = "$eventStartTime - $eventEndTime",
+                                   venue = if (eventVenue.isNullOrBlank()) "no venue added" else eventVenue,
                                    onMoreNotesClick = {
-                                       selectedNotes = extraNote
+//                                       selectedNotes = noteDescription.ifBlank { "no notes Added" }
+                                       selectedNotes = if (noteDescription.isNullOrBlank()) "no notes" else noteDescription
                                        showSheet = true
-                                   },
+                                   }
                                )
                            }
 
@@ -641,7 +641,7 @@ fun PastReminderCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .shadow(8.dp, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.saffron)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(

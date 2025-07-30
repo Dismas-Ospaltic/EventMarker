@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.st11.eventmarker.model.EventEntity
 
 
-@Database(entities = [EventEntity::class], version = 3, exportSchema = false)
+@Database(entities = [EventEntity::class], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun eventDao(): EventDao

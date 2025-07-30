@@ -11,10 +11,10 @@ data class EventEntity(
     val eventStartTime: String,
     val eventEndTime: String,
     val eventTitle: String,
-    val eventVenue: String = null.toString(),
+    val eventVenue: String? = null,
     val eventPriority: String,
     val eventCategory: String,
-    val noteDescription: String = null.toString(),
+    val noteDescription: String? = null,
     val eventId: String,
     val timestamp: Long = System.currentTimeMillis()
 )
