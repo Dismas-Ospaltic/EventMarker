@@ -2,6 +2,7 @@ package com.st11.eventmarker.di
 
 import com.st11.eventmarker.data.local.AppDatabase
 import com.st11.eventmarker.repository.EventRepository
+import com.st11.eventmarker.viewmodel.EventNotifyViewModel
 import com.st11.eventmarker.viewmodel.EventViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -19,6 +20,9 @@ val appModule = module {
     single { AppDatabase.getDatabase(get()).eventDao() }
     single { EventRepository(get()) }
     viewModel {  EventViewModel(get()) }
+
+
+    viewModel { EventNotifyViewModel() }
 //
 //
 //

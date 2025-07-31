@@ -2,7 +2,9 @@ package com.st11.eventmarker.screens
 
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,6 +41,8 @@ import com.st11.eventmarker.utils.DatePickerField
 import com.st11.eventmarker.utils.DynamicStatusBar
 import com.st11.eventmarker.utils.TimePickerField
 import com.st11.eventmarker.utils.addEventToCalendar
+import com.st11.eventmarker.utils.requestNotificationPermission
+import com.st11.eventmarker.viewmodel.EventNotifyViewModel
 import com.st11.eventmarker.viewmodel.EventViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
@@ -46,6 +50,7 @@ import compose.icons.fontawesomeicons.solid.Clipboard
 import compose.icons.fontawesomeicons.solid.Search
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDateTime
 import kotlin.random.Random
 
 
@@ -67,15 +72,23 @@ fun AddMarkScreen(navController: NavController) {
     var startTime by remember { mutableStateOf("") }
     var endTime by remember { mutableStateOf("") }
 
-    val context = LocalContext.current
 
     val eventViewModel: EventViewModel = koinViewModel()
+
+    val viewModel: EventNotifyViewModel = koinViewModel()
+
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+//
 
     DynamicStatusBar(backgroundColor)
 
     //user calender permission
     val permissionState = remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(true) }
+
+
 
     // Check if permission is already granted
     LaunchedEffect(Unit) {
@@ -90,11 +103,8 @@ fun AddMarkScreen(navController: NavController) {
         permissionState.value = hasReadPermission && hasWritePermission
 
         // If not granted, show dialog once
-//        if (!permissionState.value) {
-//            showPermissionDialog = true
-//        }
         if (!permissionState.value) {
-            delay(300) // Add delay to prevent flicker
+            delay(2000) // Add delay to prevent flicker
             showPermissionDialog = true
         }
     }
@@ -110,19 +120,6 @@ fun AddMarkScreen(navController: NavController) {
             Toast.makeText(context, "Calendar permissions denied", Toast.LENGTH_SHORT).show()
         }
     }
-//
-//    val permissionLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.RequestMultiplePermissions()
-//    ) { permissions ->
-//        val allGranted = permissions[Manifest.permission.READ_CALENDAR] == true &&
-//                permissions[Manifest.permission.WRITE_CALENDAR] == true
-//
-//        permissionState.value = allGranted
-//        if (!allGranted) {
-//            Toast.makeText(context, "Calendar permissions denied", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-
 
 
         // Show rationale dialog before requesting
@@ -155,12 +152,6 @@ fun AddMarkScreen(navController: NavController) {
                 }
             )
         }
-
-
-//// Ask for permission once when the Composable is launched
-//    LaunchedEffect(Unit) {
-//        permissionLauncher.launch(Manifest.permission.WRITE_CALENDAR)
-//    }
 
 
     val priorityType = listOf(
@@ -383,11 +374,6 @@ fun AddMarkScreen(navController: NavController) {
                 }
             }
 
-
-            // ✅ Date Picker
-//            DatePickerField(label = "Select Date *") { date ->
-//                date = date
-//            }
                 DatePickerField(label = "Select a date") { date ->
                     selectedDate = date
                 }
@@ -456,7 +442,25 @@ fun AddMarkScreen(navController: NavController) {
                             Toast.makeText(context, "Event saved but calendar permission not granted", Toast.LENGTH_SHORT).show()
                         }
 
-                     navController.popBackStack()
+                        val date = selectedDate
+                        val time = startTime
+                        val (year, month, day) = date.split("-").map { it.toInt() }
+                        val (hour, minute) = time.split(":").map { it.toInt() }
+
+                        val dateTime = LocalDateTime.of(year, month, day, hour, minute)
+
+                        val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) == PackageManager.PERMISSION_GRANTED
+                        } else true
+
+                        if (granted) {
+                            // Safe to send notification
+                            viewModel.scheduleEventNotification(context, dateTime, "", eventTitle)
+                        }
+                        navController.popBackStack()
 
 
                     } else {

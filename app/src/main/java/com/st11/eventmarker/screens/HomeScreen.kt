@@ -1,5 +1,7 @@
 package com.st11.eventmarker.screens
 
+import android.app.Activity
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,6 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -41,6 +44,7 @@ import com.st11.eventmarker.R
 import com.st11.eventmarker.navigation.Screen
 import com.st11.eventmarker.screens.components.EditablePopup
 import com.st11.eventmarker.utils.DynamicStatusBar
+import com.st11.eventmarker.utils.requestNotificationPermission
 import com.st11.eventmarker.viewmodel.EventViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
@@ -73,12 +77,24 @@ fun HomeScreen(navController: NavController) {
         else -> 4 // More columns for larger screens
     }
 
+    val context = LocalContext.current
+    val activity = context as? Activity
+
 
 
     val eventViewModel: EventViewModel = koinViewModel()
     val events by eventViewModel.events.collectAsState()
     val pastEvents by eventViewModel.pastEvents.collectAsState()
 
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (activity != null) {
+                requestNotificationPermission(activity)
+            }
+        }
+
+
+    }
 
 
     DynamicStatusBar(backgroundColor)
