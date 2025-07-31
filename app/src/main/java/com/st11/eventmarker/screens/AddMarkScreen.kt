@@ -78,9 +78,7 @@ fun AddMarkScreen(navController: NavController) {
     val viewModel: EventNotifyViewModel = koinViewModel()
 
     val context = LocalContext.current
-    val activity = context as? Activity
 
-//
 
     DynamicStatusBar(backgroundColor)
 
@@ -411,71 +409,150 @@ fun AddMarkScreen(navController: NavController) {
                 )
 
 
-            // ✅ Save Button
-            Button(
-                onClick = {
-                    if (eventTitle.isNotEmpty() && selectedDate.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
+//            // ✅ Save Button
+//            Button(
+//                onClick = {
+//                    if (eventTitle.isNotEmpty() && selectedDate.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
+//
+//                    eventViewModel.insertEvent(
+//                        EventEntity(
+//                        eventDate = selectedDate,
+//                         eventStartTime = startTime,
+//                        eventEndTime = endTime,
+//                        eventTitle = eventTitle,
+//                        eventVenue = eventVenue,
+//                        eventPriority = priority,
+//                         eventId = generateSixDigitRandomNumber().toString(),
+//                            eventCategory = category
+//                        )
+//                    )
+//                        // ✅ Add to calendar only if permission granted
+//                        if (permissionState.value) {
+//                            addEventToCalendar(
+//                                context = context,
+//                                title = eventTitle,
+//                                date = selectedDate,
+//                                startTime = startTime,
+//                                endTime = endTime,
+//                                location = eventVenue
+//                            )
+//                        } else {
+//                            Toast.makeText(context, "Event saved but calendar permission not granted", Toast.LENGTH_SHORT).show()
+//                        }
+//
+//                        val date = selectedDate
+//                        val time = startTime
+//                        val (year, month, day) = date.split("-").map { it.toInt() }
+//                        val (hour, minute) = time.split(":").map { it.toInt() }
+//
+//                        val dateTime = LocalDateTime.of(year, month, day, hour, minute)
+//
+//                        val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//                            ContextCompat.checkSelfPermission(
+//                                context,
+//                                Manifest.permission.POST_NOTIFICATIONS
+//                            ) == PackageManager.PERMISSION_GRANTED
+//                        } else true
+//
+//                        if (granted) {
+//                            // Safe to send notification
+//                            viewModel.scheduleEventNotification(context, dateTime, "", eventTitle)
+//                        }
+//                        navController.popBackStack()
+//
+//                    } else {
+//                        Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+//                    }
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(48.dp),
+//                    shape = RoundedCornerShape(8.dp),
+//                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.persianGreen))
+//            ) {
+//                Text("Add to calender", color = Color.White, fontSize = 16.sp)
+//            }
 
-                    eventViewModel.insertEvent(
-                        EventEntity(
-                        eventDate = selectedDate,
-                         eventStartTime = startTime,
-                        eventEndTime = endTime,
-                        eventTitle = eventTitle,
-                        eventVenue = eventVenue,
-                        eventPriority = priority,
-                         eventId = generateSixDigitRandomNumber().toString(),
-                            eventCategory = category
-                        )
-                    )
-                        // ✅ Add to calendar only if permission granted
-                        if (permissionState.value) {
-                            addEventToCalendar(
-                                context = context,
-                                title = eventTitle,
-                                date = selectedDate,
-                                startTime = startTime,
-                                endTime = endTime,
-                                location = eventVenue
+                Button(
+                    onClick = {
+                        if (
+                            eventTitle.isNotEmpty() &&
+                            selectedDate.isNotEmpty() &&
+                            startTime.isNotEmpty() &&
+                            endTime.isNotEmpty() &&
+                            priority.isNotEmpty() &&
+                            category.isNotEmpty()
+                        ) {
+                            // 🔹 Save to DB
+                            eventViewModel.insertEvent(
+                                EventEntity(
+                                    eventDate = selectedDate,
+                                    eventStartTime = startTime,
+                                    eventEndTime = endTime,
+                                    eventTitle = eventTitle,
+                                    eventVenue = eventVenue,
+                                    eventPriority = priority,
+                                    eventId = generateSixDigitRandomNumber().toString(),
+                                    eventCategory = category
+                                )
                             )
+
+                            // 🔹 Try to add to calendar if permission granted
+                            if (permissionState.value) {
+                                addEventToCalendar(
+                                    context = context,
+                                    title = eventTitle,
+                                    date = selectedDate,
+                                    startTime = startTime,
+                                    endTime = endTime,
+                                    location = eventVenue
+                                )
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Event saved but calendar permission not granted",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            // 🔹 Safe Notification Setup
+                            try {
+                                val (year, month, day) = selectedDate.split("-").map { it.toInt() }
+                                val (hour, minute) = startTime.split(":").map { it.toInt() }
+
+                                val dateTime = LocalDateTime.of(year, month, day, hour, minute)
+
+                                val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                } else true
+
+                                if (granted) {
+                                    viewModel.scheduleEventNotification(context, dateTime, "", eventTitle)
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Toast.makeText(context, "Failed to schedule notification", Toast.LENGTH_SHORT).show()
+                            }
+
+                            // 🔹 Navigate Back
+                            navController.popBackStack()
                         } else {
-                            Toast.makeText(context, "Event saved but calendar permission not granted", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
                         }
-
-                        val date = selectedDate
-                        val time = startTime
-                        val (year, month, day) = date.split("-").map { it.toInt() }
-                        val (hour, minute) = time.split(":").map { it.toInt() }
-
-                        val dateTime = LocalDateTime.of(year, month, day, hour, minute)
-
-                        val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.POST_NOTIFICATIONS
-                            ) == PackageManager.PERMISSION_GRANTED
-                        } else true
-
-                        if (granted) {
-                            // Safe to send notification
-                            viewModel.scheduleEventNotification(context, dateTime, "", eventTitle)
-                        }
-                        navController.popBackStack()
-
-
-                    } else {
-                        Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.persianGreen))
-            ) {
-                Text("Add to calender", color = Color.White, fontSize = 16.sp)
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.persianGreen))
+                ) {
+                    Text("Add to calendar", color = Color.White, fontSize = 16.sp)
+                }
+
             }
-        }
         }
     }
 }
