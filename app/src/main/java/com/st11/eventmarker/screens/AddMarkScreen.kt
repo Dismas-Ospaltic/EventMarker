@@ -5,6 +5,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,11 +45,13 @@ import com.st11.eventmarker.utils.addEventToCalendar
 import com.st11.eventmarker.utils.requestNotificationPermission
 import com.st11.eventmarker.viewmodel.EventNotifyViewModel
 import com.st11.eventmarker.viewmodel.EventViewModel
+import com.st11.eventmarker.viewmodel.NotificationViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Clipboard
 import compose.icons.fontawesomeicons.solid.Search
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -75,10 +78,13 @@ fun AddMarkScreen(navController: NavController) {
 
     val eventViewModel: EventViewModel = koinViewModel()
 
-    val viewModel: EventNotifyViewModel = koinViewModel()
+    val viewModel: NotificationViewModel = koinViewModel()
 
     val context = LocalContext.current
 
+
+    // ✅ 1. Get a coroutine scope tied to the composable's lifecycle
+    val scope = rememberCoroutineScope()
 
     DynamicStatusBar(backgroundColor)
 
@@ -412,6 +418,8 @@ fun AddMarkScreen(navController: NavController) {
 //            // ✅ Save Button
 //            Button(
 //                onClick = {
+//                    // ✅ 2. Launch a coroutine for background tasks
+//                    scope.launch {
 //                    if (eventTitle.isNotEmpty() && selectedDate.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
 //
 //                    eventViewModel.insertEvent(
@@ -463,7 +471,8 @@ fun AddMarkScreen(navController: NavController) {
 //                    } else {
 //                        Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
 //                    }
-//                },
+//                }
+//            },
 //                modifier = Modifier
 //                    .fillMaxWidth()
 //                    .height(48.dp),
@@ -475,72 +484,66 @@ fun AddMarkScreen(navController: NavController) {
 
                 Button(
                     onClick = {
-                        if (
-                            eventTitle.isNotEmpty() &&
-                            selectedDate.isNotEmpty() &&
-                            startTime.isNotEmpty() &&
-                            endTime.isNotEmpty() &&
-                            priority.isNotEmpty() &&
-                            category.isNotEmpty()
-                        ) {
-                            // 🔹 Save to DB
-                            eventViewModel.insertEvent(
-                                EventEntity(
-                                    eventDate = selectedDate,
-                                    eventStartTime = startTime,
-                                    eventEndTime = endTime,
-                                    eventTitle = eventTitle,
-                                    eventVenue = eventVenue,
-                                    eventPriority = priority,
-                                    eventId = generateSixDigitRandomNumber().toString(),
-                                    eventCategory = category
+                        scope.launch {
+                            if (eventTitle.isNotEmpty() && selectedDate.isNotEmpty() && startTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
+
+                                // 1. ✅ Save the event first. This should now succeed.
+                                eventViewModel.insertEvent(
+                                    EventEntity(
+                                        eventDate = selectedDate,
+                                        eventStartTime = startTime,
+                                        eventEndTime = endTime,
+                                        eventTitle = eventTitle,
+                                        eventVenue = eventVenue,
+                                        eventPriority = priority,
+                                        eventId = generateSixDigitRandomNumber().toString(),
+                                        eventCategory = category
+                                    )
                                 )
-                            )
 
-                            // 🔹 Try to add to calendar if permission granted
-                            if (permissionState.value) {
-                                addEventToCalendar(
-                                    context = context,
-                                    title = eventTitle,
-                                    date = selectedDate,
-                                    startTime = startTime,
-                                    endTime = endTime,
-                                    location = eventVenue
-                                )
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Event saved but calendar permission not granted",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                                // 2. 🛡️ Now, attempt the risky notification scheduling inside a try-catch block.
+                                try {
+                                    val (year, month, day) = selectedDate.split("-").map { it.toInt() }
+                                    val (hour, minute) = startTime.split(":").map { it.toInt() }
 
-                            // 🔹 Safe Notification Setup
-                            try {
-                                val (year, month, day) = selectedDate.split("-").map { it.toInt() }
-                                val (hour, minute) = startTime.split(":").map { it.toInt() }
+                                    val dateTime = LocalDateTime.of(year, month, day, hour, minute)
 
-                                val dateTime = LocalDateTime.of(year, month, day, hour, minute)
+                                    val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            Manifest.permission.POST_NOTIFICATIONS
+                                        ) == PackageManager.PERMISSION_GRANTED
+                                    } else true
 
-                                val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.POST_NOTIFICATIONS
-                                    ) == PackageManager.PERMISSION_GRANTED
-                                } else true
+                                    if (granted) {
+//                                        viewModel.scheduleEventNotification(context, dateTime, "", eventTitle)
+                                        viewModel.scheduleUserNotification(
+                                            context = context,
+                                            title = "Event: Rent Payment",
+                                            message = "Reminder: Pay rent today at 10:00 AM",
+                                            year = year,
+                                            month = month,
+                                            day = day,
+                                            hour = hour,
+                                            minute = minute
+                                        )
 
-                                if (granted) {
-                                    viewModel.scheduleEventNotification(context, dateTime, "", eventTitle)
+
+                                    }
+
+                                } catch (e: Exception) {
+                                    // If parsing fails, log the error instead of crashing!
+                                    Log.e("AddEventScreen", "Failed to parse date/time and schedule notification.", e)
+                                    // Optionally, inform the user with a Toast
+                                    Toast.makeText(context, "Event saved, but failed to set reminder.", Toast.LENGTH_LONG).show()
                                 }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                Toast.makeText(context, "Failed to schedule notification", Toast.LENGTH_SHORT).show()
-                            }
 
-                            // 🔹 Navigate Back
-                            navController.popBackStack()
-                        } else {
-                            Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+                                // 3. ✅ Finally, navigate back.
+                                navController.popBackStack()
+
+                            } else {
+                                Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     },
                     modifier = Modifier

@@ -4,6 +4,7 @@ import com.st11.eventmarker.data.local.AppDatabase
 import com.st11.eventmarker.repository.EventRepository
 import com.st11.eventmarker.viewmodel.EventNotifyViewModel
 import com.st11.eventmarker.viewmodel.EventViewModel
+import com.st11.eventmarker.viewmodel.NotificationViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -22,7 +23,7 @@ val appModule = module {
     viewModel {  EventViewModel(get()) }
 
 
-    viewModel { EventNotifyViewModel() }
+    viewModel { NotificationViewModel() }
 //
 //
 //
