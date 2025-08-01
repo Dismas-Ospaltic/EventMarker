@@ -172,40 +172,6 @@ fun HomeScreen(navController: NavController) {
 //                .verticalScroll(rememberScrollState())
         ) {
 
-
-            val cardDataReminder = listOf(
-                CardInfoReminder(
-                    "Doctors appointment",
-                    "12/12/2023",
-                    "appointment",
-                    "high",
-                    "10:00AM",
-                    "12:00PM",
-                    "Hospital",
-                    "Bring all reports and X-ray images."
-                ),
-                CardInfoReminder(
-                    "Gym Session",
-                    "14/12/2023",
-                    "fitness",
-                    "low",
-                    "06:00PM",
-                    "07:00PM",
-                    "City Gym",
-                    "Don’t forget water bottle."
-                ),
-                CardInfoReminder(
-                    "Doctors appointment",
-                    "12/12/2023",
-                    "appointment",
-                    "high",
-                    "10:00AM",
-                    "12:00PM",
-                    "Hospital",
-                    "Bring all reports and X-ray images."
-                )
-            )
-
                    LazyVerticalGrid(
                        columns = GridCells.Fixed(columns),
                        modifier = Modifier
@@ -241,7 +207,8 @@ fun HomeScreen(navController: NavController) {
                                fontWeight = FontWeight.Bold,
                                modifier = Modifier
                                    .fillMaxWidth()
-                                   .background(colorResource(id = R.color.persianGreen))
+                                   .clip(RoundedCornerShape(20.dp)) // ✅ Clip first
+                                   .background(colorResource(id = R.color.saffron))
                                    .padding(vertical = 12.dp, horizontal = 16.dp),
                                textAlign = TextAlign.Center
                            )
@@ -250,78 +217,58 @@ fun HomeScreen(navController: NavController) {
 
                        if (events.isEmpty()) {
                            item(span = { GridItemSpan(maxLineSpan) }) {
+
                                Box(
                                    modifier = Modifier
-                                       .fillMaxWidth()
-                                       .padding(12.dp)
-                                       .heightIn(min = 200.dp), // Guarantees at least 200dp height
+                                       .fillMaxSize(),
                                    contentAlignment = Alignment.Center
                                ) {
-                                   Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                       Icon(
-                                           imageVector = FontAwesomeIcons.Solid.Clipboard,
-                                           contentDescription = "No data",
-                                           tint = Color.Gray,
-                                           modifier = Modifier.size(64.dp)
+                                   Column(
+                                       horizontalAlignment = Alignment.CenterHorizontally
+                                   ) {
+                                       Image(
+                                           painter = painterResource(id = R.drawable.work_order), // Replace with your image in res/drawable
+                                           contentDescription = "No Data",
+                                           modifier = Modifier.size(120.dp)
                                        )
-                                       Spacer(modifier = Modifier.height(8.dp))
+                                       Spacer(modifier = Modifier.height(12.dp))
                                        Text(
-                                           text = "No data found, Click the plus Icon to add a customer/client",
+                                           text = "No Activities Added, Click the plus (+) Icon to add a Reminder",
                                            color = Color.Gray,
-                                           fontSize = 18.sp,
-                                           fontWeight = FontWeight.Medium
+                                           style = MaterialTheme.typography.bodyMedium
                                        )
                                    }
                                }
+
+
                            }
                        }else if(filteredEvent.isEmpty()){
  item(span = { GridItemSpan(maxLineSpan) }){
      // No data available after search
      Box(
-         modifier = Modifier.fillMaxSize(),
+         modifier = Modifier
+             .fillMaxSize(),
          contentAlignment = Alignment.Center
      ) {
-         Text(
-             text = "No Results Found",
-             fontSize = 18.sp,
-             fontWeight = FontWeight.Bold,
-             color = Color.Gray
-         )
+         Column(
+             horizontalAlignment = Alignment.CenterHorizontally
+         ) {
+             Image(
+                 painter = painterResource(id = R.drawable.search), // Replace with your image in res/drawable
+                 contentDescription = "No Data",
+                 modifier = Modifier.size(120.dp)
+             )
+             Spacer(modifier = Modifier.height(12.dp))
+             Text(
+                 text = "No Activities Results Found !",
+                 color = Color.Gray,
+                 style = MaterialTheme.typography.bodyMedium
+             )
+         }
      }
  }
                        }else{
-//                           itemsIndexed(filteredEvent) { index, event ->
-//                               ReminderCard(
-//                                   priority = event.eventPriority,
-//                                   title = event.eventTitle,
-//                                   date = event.eventDate,
-//                                   time = "${event.eventStartTime} - ${event.eventEndTime}",
-//                                   venue = event.eventVenue,
-//                                   onMoreNotesClick = {
-//                                       selectedNotes = event.noteDescription
-//                                       showSheet = true
-//                                   },
-//                                   onEditClick = {
-//                                       showDialog = true // Just trigger the flag
-//                                   }
-//
-//
-//                               )
-//                               if (showDialog) {
-//                                   EditablePopup(
-//                                       initialText = selectedText,
-//                                       onDismiss = { showDialog = false },
-//                                       onSave = { newText ->
-//                                           selectedText = newText
-//                                           showDialog = false
-//                                       }
-//                                   )
-//                               }
-//                           }
-
-
                            items(filteredEvent.size){
-//                             val (priority, title, date, startTime, endTime ,venue, extraNote) = filteredEvent[it]
                                val(id,eventDate, eventStartTime, eventEndTime, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription, eventId, timestamp) = filteredEvent[it]
                                ReminderCard(
                                priority = eventPriority.toString(),
@@ -352,31 +299,8 @@ fun HomeScreen(navController: NavController) {
 
                            }
 
-
-
-
                        }
 
-//                       items(cardDataReminder.size) { index ->
-//                           val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
-//                           ReminderCard(
-//                               priority = priority,
-//                               title = title,
-//                               date = date,
-//                               time = "$startTime - $endTime",
-//                               venue = venue,
-//                               onMoreNotesClick = {
-//                                   selectedNotes = extraNote
-//                                   showSheet = true
-//                               },
-//                               onEditClick = {
-//                                   showDialog = true // Just trigger the flag
-//                               }
-//
-//
-//                           )
-//
-//                       }
 
                        item(span = { GridItemSpan(maxLineSpan) }) {
                            Text(
@@ -386,6 +310,7 @@ fun HomeScreen(navController: NavController) {
                                fontWeight = FontWeight.Bold,
                                modifier = Modifier
                                    .fillMaxWidth()
+                                   .clip(RoundedCornerShape(20.dp)) // ✅ Clip first
                                    .background(colorResource(id = R.color.charcoal))
                                    .padding(vertical = 12.dp, horizontal = 16.dp),
                                textAlign = TextAlign.Center
@@ -393,64 +318,66 @@ fun HomeScreen(navController: NavController) {
                        }
 
 
-                       if (pastEvents.isEmpty()) {
+                       if(pastEvents.isEmpty()) {
+
                            item(span = { GridItemSpan(maxLineSpan) }) {
+
                                Box(
                                    modifier = Modifier
-                                       .fillMaxWidth()
-                                       .padding(12.dp)
-                                       .heightIn(min = 200.dp), // Guarantees at least 200dp height
+                                       .fillMaxSize(),
                                    contentAlignment = Alignment.Center
                                ) {
-                                   Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                       Icon(
-                                           imageVector = FontAwesomeIcons.Solid.Clipboard,
-                                           contentDescription = "No data",
-                                           tint = Color.Gray,
-                                           modifier = Modifier.size(64.dp)
+                                   Column(
+                                       horizontalAlignment = Alignment.CenterHorizontally
+                                   ) {
+                                       Image(
+                                           painter = painterResource(id = R.drawable.work_order), // Replace with your image in res/drawable
+                                           contentDescription = "No Data",
+                                           modifier = Modifier.size(120.dp)
                                        )
-                                       Spacer(modifier = Modifier.height(8.dp))
+                                       Spacer(modifier = Modifier.height(12.dp))
                                        Text(
-                                           text = "No data found, Click the plus Icon to add a customer/client",
+                                           text = "No data available!",
                                            color = Color.Gray,
-                                           fontSize = 18.sp,
-                                           fontWeight = FontWeight.Medium
+                                           style = MaterialTheme.typography.bodyMedium
                                        )
                                    }
                                }
-                           }
-                       }else if(filteredPastEvent.isEmpty()) {
-                           item(span = { GridItemSpan(maxLineSpan) }) {
-                               // No data available after search
-                               Box(
-                                   modifier = Modifier.fillMaxSize(),
-                                   contentAlignment = Alignment.Center
-                               ) {
-                                   Text(
-                                       text = "No Results Found",
-                                       fontSize = 18.sp,
-                                       fontWeight = FontWeight.Bold,
-                                       color = Color.Gray
-                                   )
-                               }
-                           }
-                       }else{
 
-//                               itemsIndexed(filteredPastEvent) { index, pastevent ->
-//                                   PastReminderCard(
-//                                       priority = pastevent.eventPriority,
-//                                       title = pastevent.eventTitle,
-//                                       date = pastevent.eventDate,
-//                                       time = "${pastevent.eventStartTime} - ${pastevent.eventEndTime}",
-//                                       venue = pastevent.eventVenue,
-//                                       onMoreNotesClick = {
-//                                           selectedNotes = ${pastevent.noteDescription}
-//                                           showSheet = true
-//                                       }
-//                                   )
-//                               }
-                           items(filteredPastEvent.size){
-                               val(id,eventDate, eventStartTime, eventEndTime, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription, eventId, timestamp) = filteredPastEvent[it]
+
+                           }
+                       }else if(filteredPastEvent.isEmpty()){
+                               item(span = { GridItemSpan(maxLineSpan) }){
+                                   // No data available after search
+                                   Box(
+                                       modifier = Modifier
+                                           .fillMaxSize(),
+                                       contentAlignment = Alignment.Center
+                                   ) {
+                                       Column(
+                                           horizontalAlignment = Alignment.CenterHorizontally
+                                       ) {
+                                           Image(
+                                               painter = painterResource(id = R.drawable.search), // Replace with your image in res/drawable
+                                               contentDescription = "No Data",
+                                               modifier = Modifier.size(120.dp)
+                                           )
+                                           Spacer(modifier = Modifier.height(12.dp))
+                                           Text(
+                                               text = "No Activities Results Found !",
+                                               color = Color.Gray,
+                                               style = MaterialTheme.typography.bodyMedium
+                                           )
+                                       }
+                                   }
+
+                               }
+
+
+
+                       }else{
+                           items(filteredPastEvent.size) {
+                               val (id, eventDate, eventStartTime, eventEndTime, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription, eventId, timestamp) = filteredPastEvent[it]
 
                                PastReminderCard(
                                    priority = eventPriority.toString(),
@@ -460,33 +387,15 @@ fun HomeScreen(navController: NavController) {
                                    venue = if (eventVenue.isNullOrBlank()) "no venue added" else eventVenue,
                                    onMoreNotesClick = {
 //                                       selectedNotes = noteDescription.ifBlank { "no notes Added" }
-                                       selectedNotes = if (noteDescription.isNullOrBlank()) "no notes" else noteDescription
+                                       selectedNotes =
+                                           if (noteDescription.isNullOrEmpty()) "no notes" else noteDescription
                                        showSheet = true
                                    }
                                )
                            }
-
-
                        }
 
-
-
-//                       items(cardDataReminder.size) { index ->
-//                           val (title, date, type, priority, startTime, endTime, venue, extraNote) = cardDataReminder[index]
-//                           PastReminderCard(
-//                               priority = priority,
-//                               title = title,
-//                               date = date,
-//                               time = "$startTime - $endTime",
-//                               venue = venue,
-//                               onMoreNotesClick = {
-//                                   selectedNotes = extraNote
-//                                   showSheet = true
-//                               },
-//                           )
-//                       }
                    }
-
 
 
 
@@ -657,7 +566,7 @@ fun PastReminderCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .shadow(8.dp, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.saffron)),
+        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.gray01)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(

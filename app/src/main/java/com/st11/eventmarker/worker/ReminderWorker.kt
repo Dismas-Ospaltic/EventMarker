@@ -1,7 +1,5 @@
 package com.st11.eventmarker.worker
 
-
-
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -18,8 +16,6 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.st11.eventmarker.R
 
-
-
 class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
 
@@ -33,18 +29,22 @@ class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
 
     private fun showNotification(title: String, message: String) {
         val channelId = "reminder_channel"
+        val soundUri = Uri.parse("android.resource://${applicationContext.packageName}/${R.raw.notify}")
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val soundUri = Uri.parse("android.resource://${applicationContext.packageName}/${R.raw.notify}")
             val attributes = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build()
 
             val channel = NotificationChannel(
                 channelId,
                 "Reminder Notifications",
                 NotificationManager.IMPORTANCE_HIGH
-            )
+            ).apply {
+                setSound(soundUri, attributes) // ✅ THIS LINE IS CRITICAL
+            }
+
             val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
@@ -66,9 +66,11 @@ class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
             .setContentText(message)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(Uri.parse("android.resource://${applicationContext.packageName}/${R.raw.notify}"))
             .setContentIntent(pendingIntent)
+            // ❌ Do NOT use setSound() for Android 8+, it's ignored. Kept here only for below-26 fallback.
+            .setSound(soundUri)
 
+        // Android 13+ permission check
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.POST_NOTIFICATIONS)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -79,3 +81,4 @@ class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
         }
     }
 }
+

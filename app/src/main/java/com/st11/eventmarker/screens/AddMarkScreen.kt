@@ -43,7 +43,6 @@ import com.st11.eventmarker.utils.DynamicStatusBar
 import com.st11.eventmarker.utils.TimePickerField
 import com.st11.eventmarker.utils.addEventToCalendar
 import com.st11.eventmarker.utils.requestNotificationPermission
-import com.st11.eventmarker.viewmodel.EventNotifyViewModel
 import com.st11.eventmarker.viewmodel.EventViewModel
 import com.st11.eventmarker.viewmodel.NotificationViewModel
 import compose.icons.FontAwesomeIcons
