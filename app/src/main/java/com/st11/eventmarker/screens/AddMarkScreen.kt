@@ -501,6 +501,20 @@ fun AddMarkScreen(navController: NavController) {
                                     )
                                 )
 
+                        // ✅ Add to calendar only if permission granted
+                        if (permissionState.value) {
+                            addEventToCalendar(
+                                context = context,
+                                title = eventTitle,
+                                date = selectedDate,
+                                startTime = startTime,
+                                endTime = endTime,
+                                location = eventVenue
+                            )
+                        } else {
+                            Toast.makeText(context, "Event saved but calendar permission not granted", Toast.LENGTH_SHORT).show()
+                        }
+
                                 // 2. 🛡️ Now, attempt the risky notification scheduling inside a try-catch block.
                                 try {
                                     val (year, month, day) = selectedDate.split("-").map { it.toInt() }
@@ -519,8 +533,10 @@ fun AddMarkScreen(navController: NavController) {
 //                                        viewModel.scheduleEventNotification(context, dateTime, "", eventTitle)
                                         viewModel.scheduleUserNotification(
                                             context = context,
-                                            title = "Event: Rent Payment",
-                                            message = "Reminder: Pay rent today at 10:00 AM",
+                                            title = "Your upcoming activities! reminder",
+                                            message = "$eventTitle on $selectedDate from $startTime to $endTime at " +
+                                                    (if (eventVenue.isNullOrEmpty()) "Venue not set" else eventVenue) +
+                                                    ". Don't forget!",
                                             year = year,
                                             month = month,
                                             day = day,

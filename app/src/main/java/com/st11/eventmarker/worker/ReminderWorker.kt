@@ -8,6 +8,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -15,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.st11.eventmarker.R
+
 
 
 class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -32,6 +35,11 @@ class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
         val channelId = "reminder_channel"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val soundUri = Uri.parse("android.resource://${applicationContext.packageName}/${R.raw.notify}")
+            val attributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .build()
+
             val channel = NotificationChannel(
                 channelId,
                 "Reminder Notifications",
@@ -53,11 +61,12 @@ class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
         )
 
         val builder = NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(R.drawable.calendar)
+            .setSmallIcon(R.drawable.mark)
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSound(Uri.parse("android.resource://${applicationContext.packageName}/${R.raw.notify}"))
             .setContentIntent(pendingIntent)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

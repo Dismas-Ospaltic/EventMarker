@@ -23,7 +23,7 @@ interface EventDao {
     @Query("SELECT * FROM events WHERE eventDate < :formattedDate  ORDER BY timestamp DESC")
     fun getAllPastDateEvents(formattedDate: String): Flow<List<EventEntity>>
 
-    @Query("SELECT * FROM events WHERE eventDate > :formattedDate  ORDER BY timestamp DESC")
+    @Query("SELECT * FROM events WHERE eventDate >= :formattedDate  ORDER BY timestamp DESC")
     fun getAllUpcomingDateEvents(formattedDate: String): Flow<List<EventEntity>>
 
 //
