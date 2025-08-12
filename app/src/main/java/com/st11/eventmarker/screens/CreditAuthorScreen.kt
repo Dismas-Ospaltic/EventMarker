@@ -33,7 +33,7 @@ import com.st11.eventmarker.utils.DynamicStatusBar
 @Composable
 fun CreditAuthorScreen(navController: NavController) {
 
-    val backgroundColor = colorResource(id = R.color.light_green)
+    val backgroundColor = colorResource(id = R.color.seina)
     DynamicStatusBar(backgroundColor) // ✅ Keeps status bar consistent
     val context = LocalContext.current
 

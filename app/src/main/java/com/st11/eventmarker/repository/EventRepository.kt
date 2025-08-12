@@ -28,8 +28,8 @@ class EventRepository(private val eventDao: EventDao) {
         eventDao.updateEvent(event)
     }
 
-    suspend fun  updateEventsDetails(eventId: String, eventTitle: String, eventVenue: String, eventPriority: String, eventCategory: String, noteDescription: String): Boolean {
-        val rowsUpdated = eventDao.updateEventsDetails(eventId, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription) ?: 0
+    suspend fun  updateEventsDetails(eventId: String, eventTitle: String, eventVenue: String, eventPriority: String, eventCategory: String, noteDescription: String,eventDate: String): Boolean {
+        val rowsUpdated = eventDao.updateEventsDetails(eventId, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription, eventDate) ?: 0
         return rowsUpdated > 0
     }
 

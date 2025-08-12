@@ -30,8 +30,8 @@ interface EventDao {
 //    @Query("SELECT * FROM expenses ORDER BY timestamp DESC")
 //    fun getAllExpenses(): Flow<List<ExpenseEntity>>
 
-    @Query("UPDATE events SET eventTitle = :eventTitle, eventVenue = :eventVenue, eventPriority = :eventPriority, eventCategory = :eventCategory, noteDescription = :noteDescription WHERE eventId = :eventId")
-    suspend fun updateEventsDetails(eventId: String, eventTitle: String, eventVenue: String, eventPriority: String, eventCategory: String, noteDescription: String): Int?
+    @Query("UPDATE events SET eventTitle = :eventTitle, eventVenue = :eventVenue, eventPriority = :eventPriority, eventCategory = :eventCategory, noteDescription = :noteDescription , eventDate = :eventDate WHERE eventId = :eventId")
+    suspend fun updateEventsDetails(eventId: String, eventTitle: String, eventVenue: String, eventPriority: String, eventCategory: String, noteDescription: String, eventDate: String): Int?
 
 
 }

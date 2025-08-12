@@ -43,28 +43,67 @@ import java.util.Locale
 
 
 
-@Composable
-fun DatePickerField(label: String, onDateSelected: (String) -> Unit) {
-//    var selectedDate by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("") }
-//    val context = LocalContext.current
-    val backgroundColor = colorResource(id = R.color.seina)
-
-//    val calendar = Calendar.getInstance()
-//    val year = calendar.get(Calendar.YEAR)
-//    val month = calendar.get(Calendar.MONTH)
-//    val day = calendar.get(Calendar.DAY_OF_MONTH)
+//@Composable
+//fun DatePickerField(label: String, onDateSelected: (String) -> Unit, value: String) {
+////    var selectedDate by remember { mutableStateOf("") }
+////    var date by remember { mutableStateOf("") }
+////    val context = LocalContext.current
+//    val backgroundColor = colorResource(id = R.color.seina)
 //
-//    val datePickerDialog = android.app.DatePickerDialog(
-//        context,
-//        { _, y, m, d ->
-//            val formattedDate = "$d/${m + 1}/$y"
-//            selectedDate = formattedDate
-//            onDateSelected(formattedDate)
-//        },
-//        year, month, day
-//    )
+//    val context = LocalContext.current
+//    val calendar = Calendar.getInstance()
+//
+//    fun showDatePicker() {
+//        DatePickerDialog(
+//            context,
+//            { _, year, month, day ->
+//                val selectedDate = Calendar.getInstance()
+//                selectedDate.set(year, month, day)
+//                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+//                value = dateFormat.format(selectedDate.time) // Format date to "YYYY-MM-DD"
+//                onDateSelected(date)
+//            },
+//            calendar.get(Calendar.YEAR),
+//            calendar.get(Calendar.MONTH),
+//            calendar.get(Calendar.DAY_OF_MONTH)
+//        ).show()
+//    }
+//
+//
+//        OutlinedTextField(
+//            value = date,
+//            onValueChange = {},
+////            enabled = , // ✅ prevents internal click behavior
+//            label = { Text(label) },
+//            trailingIcon = {
+//                Icon(
+//                    imageVector = FontAwesomeIcons.Solid.CalendarDay,
+//                    contentDescription = "date",
+//                    tint = colorResource(id = R.color.seina),
+//                    modifier = Modifier.size(24.dp)
+////                        .clickable { datePickerDialog.show() }
+//                        .clickable { showDatePicker() }
+//                )
+//            },
+//            modifier = Modifier.fillMaxWidth(),
+//            colors = OutlinedTextFieldDefaults.colors(
+//                unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+//                focusedContainerColor = Color.White.copy(alpha = 0.95f),
+//                focusedBorderColor = backgroundColor,
+//                unfocusedBorderColor = Color.Gray,
+//                focusedLabelColor = backgroundColor,
+//                cursorColor = backgroundColor
+//            )
+//        )
+//    }
 
+@Composable
+fun DatePickerField(
+    label: String,
+    value: String, // <-- Pass in the current date from parent
+    onDateSelected: (String) -> Unit
+) {
+    val backgroundColor = colorResource(id = R.color.seina)
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
@@ -75,8 +114,7 @@ fun DatePickerField(label: String, onDateSelected: (String) -> Unit) {
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(year, month, day)
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                date = dateFormat.format(selectedDate.time) // Format date to "YYYY-MM-DD"
-                onDateSelected(date)
+                onDateSelected(dateFormat.format(selectedDate.time)) // Send result to parent
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -84,32 +122,32 @@ fun DatePickerField(label: String, onDateSelected: (String) -> Unit) {
         ).show()
     }
 
-
-        OutlinedTextField(
-            value = date,
-            onValueChange = {},
-//            enabled = , // ✅ prevents internal click behavior
-            label = { Text(label) },
-            trailingIcon = {
-                Icon(
-                    imageVector = FontAwesomeIcons.Solid.CalendarDay,
-                    contentDescription = "date",
-                    tint = colorResource(id = R.color.seina),
-                    modifier = Modifier.size(24.dp)
-//                        .clickable { datePickerDialog.show() }
-                        .clickable { showDatePicker() }
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
-                focusedContainerColor = Color.White.copy(alpha = 0.95f),
-                focusedBorderColor = backgroundColor,
-                unfocusedBorderColor = Color.Gray,
-                focusedLabelColor = backgroundColor,
-                cursorColor = backgroundColor
+    OutlinedTextField(
+        value = value, // <-- Show parent’s date here
+        onValueChange = {},
+        label = { Text(label) },
+        trailingIcon = {
+            Icon(
+                imageVector = FontAwesomeIcons.Solid.CalendarDay,
+                contentDescription = "date",
+                tint = backgroundColor,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { showDatePicker() }
             )
+        },
+        modifier = Modifier.fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+            focusedContainerColor = Color.White.copy(alpha = 0.95f),
+            focusedBorderColor = backgroundColor,
+            unfocusedBorderColor = Color.Gray,
+            focusedLabelColor = backgroundColor,
+            cursorColor = backgroundColor
         )
-    }
+    )
+}
+
+
 
 

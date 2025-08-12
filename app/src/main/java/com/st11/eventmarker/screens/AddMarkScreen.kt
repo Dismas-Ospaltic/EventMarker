@@ -89,7 +89,7 @@ fun AddMarkScreen(navController: NavController) {
 
     //user calender permission
     val permissionState = remember { mutableStateOf(false) }
-    var showPermissionDialog by remember { mutableStateOf(true) }
+    var showPermissionDialog by remember { mutableStateOf(false) }
 
 
 
@@ -377,19 +377,40 @@ fun AddMarkScreen(navController: NavController) {
                 }
             }
 
-                DatePickerField(label = "Select a date") { date ->
-                    selectedDate = date
-                }
+//                DatePickerField(label = "Select a date") { date ->
+//                    selectedDate = date
+//                }
+//
+//            // ✅ Start Time Picker
+//            TimePickerField(label = "Start Time *") { selected ->
+//                startTime = selected
+//            }
+//
+//            // ✅ End Time Picker
+//            TimePickerField(label = "End Time *") { selected ->
+//                endTime = selected
+//            }
 
-            // ✅ Start Time Picker
-            TimePickerField(label = "Start Time *") { selected ->
-                startTime = selected
-            }
 
-            // ✅ End Time Picker
-            TimePickerField(label = "End Time *") { selected ->
-                endTime = selected
-            }
+                DatePickerField(
+                    label = "Select a date",
+                    value = selectedDate, // <-- This is from your parent state
+                    onDateSelected = { date -> selectedDate = date }
+                )
+
+
+
+                TimePickerField(
+                    label = "Start Time *",
+                    value = startTime,
+                    onTimeSelected = { selected -> startTime = selected }
+                )
+
+                TimePickerField(
+                    label = "End Time *",
+                    value = endTime,
+                    onTimeSelected = { selected -> endTime = selected }
+                )
 
 
                 OutlinedTextField(
@@ -496,7 +517,8 @@ fun AddMarkScreen(navController: NavController) {
                                         eventVenue = eventVenue,
                                         eventPriority = priority,
                                         eventId = generateSixDigitRandomNumber().toString(),
-                                        eventCategory = category
+                                        eventCategory = category,
+                                        noteDescription = eventDescription
                                     )
                                 )
 

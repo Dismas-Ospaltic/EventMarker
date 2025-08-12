@@ -288,12 +288,21 @@ fun HomeScreen(navController: NavController) {
                            )
                                if (showDialog) {
                                    EditablePopup(
-                                       initialText = selectedText,
+//                                       initialText = selectedText,
                                        onDismiss = { showDialog = false },
-                                       onSave = { newText ->
-                                           selectedText = newText
-                                           showDialog = false
-                                       }
+//                                       onSave = { newText ->
+//                                           selectedText = newText
+//                                           showDialog = false
+//                                       },
+                                       itemId = eventId,
+                                       eventDate = eventDate,
+                                       eventStartTime = eventStartTime,
+                                       eventEndTime = eventEndTime,
+                                       eventTitle = eventTitle,
+                                       eventVenue = eventVenue.toString(),
+                                       eventPriority = eventPriority,
+                                       eventCategory = eventCategory,
+                                       noteDescription = noteDescription.toString()
                                    )
                                }
 
@@ -382,7 +391,7 @@ fun HomeScreen(navController: NavController) {
                                PastReminderCard(
                                    priority = eventPriority.toString(),
                                    title = eventTitle.toString(),
-                                   date = "$eventDate $noteDescription",
+                                   date = "$eventDate $noteDescription $id, $timestamp $eventId $eventCategory",
                                    time = "$eventStartTime - $eventEndTime",
                                    venue = if (eventVenue.isNullOrBlank()) "no venue added" else eventVenue,
                                    onMoreNotesClick = {

@@ -34,71 +34,109 @@ import java.util.Calendar
 import java.util.Locale
 
 
+//@Composable
+//fun TimePickerField(label: String, onTimeSelected: (String) -> Unit) {
+//    var selectedTime by remember { mutableStateOf("") }
+//    val context = LocalContext.current
+//    val backgroundColor = colorResource(id = R.color.seina)
+//
+//    Box(modifier = Modifier
+//        .fillMaxWidth()
+//
+//    ) {
+//        OutlinedTextField(
+//            value = selectedTime,
+//            onValueChange = {},
+//            label = { Text(label) },
+//            trailingIcon = {
+//                Icon(
+//                    imageVector = FontAwesomeIcons.Solid.Clock,
+//                    contentDescription = "clock",
+//                    tint = colorResource(id = R.color.seina),
+//                    modifier = Modifier.size(24.dp)
+//                        .clickable {
+//                            val calendar = Calendar.getInstance()
+//                            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+//                            val minute = calendar.get(Calendar.MINUTE)
+//
+//                            TimePickerDialog(
+//                                context,
+//                                { _, h, m ->
+//                                    val formattedTime = String.format(Locale.getDefault(),"%02d:%02d", h, m)
+//                                    selectedTime = formattedTime
+//                                    onTimeSelected(formattedTime)
+//                                },
+//                                hour, minute, false
+//                            ).show()
+//                        }
+//                )
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth(),
+//            colors = OutlinedTextFieldDefaults.colors(
+//                unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+//                focusedContainerColor = Color.White.copy(alpha = 0.95f),
+//                focusedBorderColor = backgroundColor,
+//                unfocusedBorderColor = Color.Gray,
+//                focusedLabelColor = backgroundColor,
+//                cursorColor = backgroundColor
+//            )
+//
+//        )
+//    }
+//}
+
 @Composable
-fun TimePickerField(label: String, onTimeSelected: (String) -> Unit) {
-    var selectedTime by remember { mutableStateOf("") }
+fun TimePickerField(
+    label: String,
+    value: String, // <-- parent passes this
+    onTimeSelected: (String) -> Unit
+) {
     val context = LocalContext.current
     val backgroundColor = colorResource(id = R.color.seina)
 
-    Box(modifier = Modifier
-        .fillMaxWidth()
+    OutlinedTextField(
+        value = value, // <-- display parent's value
+        onValueChange = {},
+        label = { Text(label) },
+        trailingIcon = {
+            Icon(
+                imageVector = FontAwesomeIcons.Solid.Clock,
+                contentDescription = "clock",
+                tint = backgroundColor,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+                        val calendar = Calendar.getInstance()
+                        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                        val minute = calendar.get(Calendar.MINUTE)
 
-    ) {
-        OutlinedTextField(
-            value = selectedTime,
-            onValueChange = {},
-            label = { Text(label) },
-            trailingIcon = {
-                Icon(
-                    imageVector = FontAwesomeIcons.Solid.Clock,
-                    contentDescription = "clock",
-                    tint = colorResource(id = R.color.seina),
-                    modifier = Modifier.size(24.dp)
-                        .clickable {
-                            val calendar = Calendar.getInstance()
-                            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-                            val minute = calendar.get(Calendar.MINUTE)
-
-                            TimePickerDialog(
-                                context,
-                                { _, h, m ->
-                                    val formattedTime = String.format(Locale.getDefault(),"%02d:%02d", h, m)
-                                    selectedTime = formattedTime
-                                    onTimeSelected(formattedTime)
-                                },
-                                hour, minute, false
-                            ).show()
-                        }
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
-                focusedContainerColor = Color.White.copy(alpha = 0.95f),
-                focusedBorderColor = backgroundColor,
-                unfocusedBorderColor = Color.Gray,
-                focusedLabelColor = backgroundColor,
-                cursorColor = backgroundColor
+                        TimePickerDialog(
+                            context,
+                            { _, h, m ->
+                                val formattedTime = String.format(
+                                    Locale.getDefault(),
+                                    "%02d:%02d", h, m
+                                )
+                                onTimeSelected(formattedTime)
+                            },
+                            hour, minute, false
+                        ).show()
+                    }
             )
-//                .clickable {
-//                    val calendar = Calendar.getInstance()
-//                    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-//                    val minute = calendar.get(Calendar.MINUTE)
-//
-//                    TimePickerDialog(
-//                        context,
-//                        { _, h, m ->
-//                            val formattedTime = String.format("%02d:%02d", h, m)
-//                            selectedTime = formattedTime
-//                            onTimeSelected(formattedTime)
-//                        },
-//                        hour, minute, false
-//                    ).show()
-//                }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+            focusedContainerColor = Color.White.copy(alpha = 0.95f),
+            focusedBorderColor = backgroundColor,
+            unfocusedBorderColor = Color.Gray,
+            focusedLabelColor = backgroundColor,
+            cursorColor = backgroundColor
         )
-    }
+    )
 }
+
 
 
 

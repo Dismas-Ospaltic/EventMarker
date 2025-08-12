@@ -70,9 +70,9 @@ fun SettingScreen(navController: NavController) {
                 .padding(
 //                    top = paddingValues.calculateTopPadding(),
 //                    bottom = 0.dp
-                    start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+                    start = paddingValues.calculateStartPadding(LocalLayoutDirection.current) + 12.dp,
                     top = paddingValues.calculateTopPadding(),
-                    end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+                    end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + 12.dp,
                     bottom = paddingValues.calculateBottomPadding() + 78.dp
                 )
                 .background(color = colorResource(id = R.color.light_bg_color))

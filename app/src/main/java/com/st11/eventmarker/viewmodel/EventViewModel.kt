@@ -69,9 +69,9 @@ class  EventViewModel(private val eventRepository: EventRepository) : ViewModel(
     /**
      * Update the details of events
      */
-    fun updateEventsDetails(eventId: String, eventTitle: String, eventVenue: String, eventPriority: String, eventCategory: String, noteDescription: String) {
+    fun updateEventsDetails(eventId: String, eventTitle: String, eventVenue: String, eventPriority: String, eventCategory: String, noteDescription: String, eventDate: String) {
         viewModelScope.launch {
-            val success = eventRepository.updateEventsDetails(eventId, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription)
+            val success = eventRepository.updateEventsDetails(eventId, eventTitle, eventVenue, eventPriority, eventCategory, noteDescription,eventDate)
             if (success) {
                 // Refresh debt list if update is successful
                 _events.value = _events.value.map { event ->
