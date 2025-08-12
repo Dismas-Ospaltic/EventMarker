@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.st11.eventmarker.screens.AddMarkScreen
+import com.st11.eventmarker.screens.CreditAuthorScreen
 import com.st11.eventmarker.screens.HomeScreen
 import com.st11.eventmarker.screens.SettingScreen
 import org.koin.androidx.compose.getViewModel
@@ -24,6 +25,9 @@ sealed class Screen(val route: String) {
     }
 
     object AddToCalendar : Screen("addToCalendar")
+
+
+    object  CreditAuthor : Screen("CreditAuthor")
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -42,7 +46,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier) {
         composable(Screen.Home.route) { HomeScreen(navController) }
         composable(Screen.Settings.route) { SettingScreen(navController) }
         composable(Screen.AddToCalendar.route) {  AddMarkScreen(navController)   }
-
+        composable(Screen.CreditAuthor.route) {  CreditAuthorScreen(navController)   }
 
 //        composable(Screen.EditCalendar.route) { backStackEntry ->
 //            val itemId = backStackEntry.arguments?.getString("itemId") ?: "Unknown"
