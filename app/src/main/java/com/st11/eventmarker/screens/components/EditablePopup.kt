@@ -77,20 +77,11 @@ fun EditablePopup(
     eventCategory: String,
     noteDescription: String
 ) {
-//    var text by remember { mutableStateOf(initialText) }
 
     val backgroundColor = colorResource(id = R.color.seina)
-//    var title by remember { mutableStateOf("") }
-//    var venue by remember { mutableStateOf("") }
-//    var eventDescription by remember { mutableStateOf("") }
-//    var priority by remember { mutableStateOf("") }
+
     var expanded by remember { mutableStateOf(false) }
-//    var category by remember { mutableStateOf("") }
     var expanded01 by remember { mutableStateOf(false) }
-////    var date by remember { mutableStateOf("") }
-//    var selectedDate by remember { mutableStateOf("") }
-//    var startTime by remember { mutableStateOf("") }
-//    var endTime by remember { mutableStateOf("") }
 
     var title by remember { mutableStateOf(eventTitle) }
     var venue by remember { mutableStateOf(eventVenue) }
@@ -114,27 +105,6 @@ fun EditablePopup(
     val permissionState = remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
 
-
-    // Load the event by ID
-//    LaunchedEffect(itemId) {
-//        eventViewModelPop.loadEventById(itemId)
-//    }
-
-
-    // When eventData changes, update input fields
-//    LaunchedEffect(eventData) {
-//        eventData?.let { event ->
-//            title = event.eventTitle
-//            venue = event.eventVenue ?: ""
-//            eventDescription = event.noteDescription ?: ""
-//            priority = event.eventPriority
-//            category = event.eventCategory
-//            selectedDate = event.eventDate
-//            startTime = eventData?.eventStartTime ?: ""
-//            endTime = event.eventEndTime
-//
-//        }
-//    }
 
     // Check if permission is already granted
     LaunchedEffect(Unit) {
@@ -375,7 +345,6 @@ fun EditablePopup(
                         }
                     }
                 }
-
 
                 ExposedDropdownMenuBox(
                     expanded = expanded01,
