@@ -6,6 +6,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -41,6 +43,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.st11.eventmarker.R
+import com.st11.eventmarker.model.EventEntity
 import com.st11.eventmarker.navigation.Screen
 import com.st11.eventmarker.screens.components.EditablePopup
 import com.st11.eventmarker.utils.DynamicStatusBar
@@ -65,6 +68,15 @@ fun HomeScreen(navController: NavController) {
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
     var selectedNotes by remember { mutableStateOf("") }
+    var selectedEventId by remember { mutableStateOf<String?>(null) }
+        var selectedTitle by remember { mutableStateOf<String?>(null) }
+    var selectedVenue by remember { mutableStateOf<String?>(null) }
+    var selectedEventDescription by remember { mutableStateOf<String?>(null) }
+    var selectedPriority by remember { mutableStateOf<String?>(null) }
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var selectedSelectedDate by remember { mutableStateOf<String?>(null) }
+    var selectedStartTime by remember { mutableStateOf<String?>(null) }
+    var selectedEndTime by remember { mutableStateOf<String?>(null) }
 
     var showDialog by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("Initial Text") }
@@ -280,13 +292,28 @@ fun HomeScreen(navController: NavController) {
                                    selectedNotes = if (noteDescription.isNullOrBlank()) "no notes Added" else noteDescription
                                    showSheet = true
                                },
+
                                onEditClick = {
                                    showDialog = true // Just trigger the flag
+                                   // 🔹 Store the ID of the selected event
+                                   selectedEventId = eventId
+                                   selectedTitle = eventTitle
+                                   selectedVenue = eventVenue
+                                   selectedEventDescription = noteDescription
+                                   selectedPriority = eventPriority
+                                   selectedCategory = eventCategory
+                                   selectedSelectedDate = eventDate
+                                   selectedStartTime = eventStartTime
+                                   selectedEndTime = eventEndTime
+
+                                   // 🔹 Load event data from ViewModel before showing popup
+                                   eventViewModel.loadEventById(eventId)
+
                                }
 
 
                            )
-                               if (showDialog) {
+                               if (showDialog && selectedEventId != null) {
                                    EditablePopup(
 //                                       initialText = selectedText,
                                        onDismiss = { showDialog = false },
@@ -294,15 +321,15 @@ fun HomeScreen(navController: NavController) {
 //                                           selectedText = newText
 //                                           showDialog = false
 //                                       },
-                                       itemId = eventId,
-                                       eventDate = eventDate,
-                                       eventStartTime = eventStartTime,
-                                       eventEndTime = eventEndTime,
-                                       eventTitle = eventTitle,
-                                       eventVenue = eventVenue.toString(),
-                                       eventPriority = eventPriority,
-                                       eventCategory = eventCategory,
-                                       noteDescription = noteDescription.toString()
+                                       itemId = selectedEventId!!,
+                                       eventDate = selectedSelectedDate!!,
+                                       eventStartTime = selectedStartTime!!,
+                                       eventEndTime = selectedEndTime!!,
+                                       eventTitle = selectedTitle!!,
+                                       eventVenue = selectedVenue!!,
+                                       eventPriority = selectedPriority!!,
+                                       eventCategory = selectedCategory!!,
+                                       noteDescription = selectedEventDescription!!
                                    )
                                }
 
@@ -466,6 +493,8 @@ fun ReminderCard(
     onMoreNotesClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
 
     var isMenuExpanded by remember { mutableStateOf(false) }
     val cardColor = when (priority.lowercase()) {
@@ -486,7 +515,11 @@ fun ReminderCard(
                         isMenuExpanded = true
                     }
                 )
-            },
+            }
+            .then(
+                if (isPressed) Modifier.background(cardColor.copy(alpha = 0.8f))
+                else Modifier.background(cardColor)
+            ),
         colors = CardDefaults.cardColors(containerColor = cardColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {

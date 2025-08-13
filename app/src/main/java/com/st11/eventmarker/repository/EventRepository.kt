@@ -33,6 +33,9 @@ class EventRepository(private val eventDao: EventDao) {
         return rowsUpdated > 0
     }
 
+    fun getEventsDetailById(eventId: String): Flow<EventEntity> {
+        return eventDao.getEventsDetailById(eventId)
+    }
 
 
 

@@ -66,7 +66,8 @@ fun EditablePopup(
 //    initialText: String,
     onDismiss: () -> Unit,
 //    onSave: (String) -> Unit,
-   itemId: String,
+   itemId: String
+    ,
     eventDate: String,
     eventStartTime: String,
     eventEndTime: String,
@@ -104,6 +105,8 @@ fun EditablePopup(
     val notificationPrefsViewModel: NotificationPrefsViewModel = koinViewModel()
     val userData by notificationPrefsViewModel.userData.collectAsState()
 
+    val eventViewModelPop: EventViewModel = koinViewModel()
+    val eventData  by eventViewModelPop.eventData.collectAsState()
     val context = LocalContext.current
 
 
@@ -112,6 +115,26 @@ fun EditablePopup(
     var showPermissionDialog by remember { mutableStateOf(false) }
 
 
+    // Load the event by ID
+//    LaunchedEffect(itemId) {
+//        eventViewModelPop.loadEventById(itemId)
+//    }
+
+
+    // When eventData changes, update input fields
+//    LaunchedEffect(eventData) {
+//        eventData?.let { event ->
+//            title = event.eventTitle
+//            venue = event.eventVenue ?: ""
+//            eventDescription = event.noteDescription ?: ""
+//            priority = event.eventPriority
+//            category = event.eventCategory
+//            selectedDate = event.eventDate
+//            startTime = eventData?.eventStartTime ?: ""
+//            endTime = event.eventEndTime
+//
+//        }
+//    }
 
     // Check if permission is already granted
     LaunchedEffect(Unit) {
@@ -472,7 +495,7 @@ fun EditablePopup(
                     Button(onClick = {
 //                        onSave(text)
                         scope.launch {
-                            if (eventTitle.isNotEmpty() && selectedDate.isNotEmpty() && startTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
+                            if (title.isNotEmpty() && selectedDate.isNotEmpty() && startTime.isNotEmpty() && priority.isNotEmpty() && category.isNotEmpty()) {
                         eventViewModel.updateEventsDetails(
                             itemId,
                             title,
@@ -487,11 +510,11 @@ fun EditablePopup(
                                 if (permissionState.value) {
                                     addEventToCalendar(
                                         context = context,
-                                        title = eventTitle,
+                                        title = title,
                                         date = selectedDate,
                                         startTime = startTime,
                                         endTime = endTime,
-                                        location = eventVenue
+                                        location = venue
                                     )
                                 } else {
                                     Toast.makeText(context, "Event saved but calendar permission not granted", Toast.LENGTH_SHORT).show()
@@ -520,8 +543,8 @@ fun EditablePopup(
                                             viewModel.scheduleUserNotification(
                                                 context = context,
                                                 title = "Your upcoming activities! reminder",
-                                                message = "$eventTitle on $selectedDate from $startTime to $endTime at " +
-                                                        (if (eventVenue.isNullOrEmpty()) "Venue not set" else eventVenue) +
+                                                message = "$title on $selectedDate from $startTime to $endTime at " +
+                                                        (if (venue.isNullOrEmpty()) "Venue not set" else venue) +
                                                         ". Don't forget!",
                                                 year = year,
                                                 month = month,

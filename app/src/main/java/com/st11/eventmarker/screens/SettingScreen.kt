@@ -69,100 +69,105 @@ fun SettingScreen(navController: NavController) {
         }
     ) {  paddingValues ->
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(
+            Modifier.fillMaxSize()
+            .background(color = colorResource(id = R.color.light_bg_color))) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(
 //                    top = paddingValues.calculateTopPadding(),
 //                    bottom = 0.dp
-                    start = paddingValues.calculateStartPadding(LocalLayoutDirection.current) + 12.dp,
-                    top = paddingValues.calculateTopPadding(),
-                    end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + 12.dp,
-                    bottom = paddingValues.calculateBottomPadding() + 78.dp
-                )
-                .background(color = colorResource(id = R.color.light_bg_color))
-                .verticalScroll(rememberScrollState()) // ✅ Enable scrolling
-        ) {
+                        start = paddingValues.calculateStartPadding(LocalLayoutDirection.current) + 12.dp,
+                        top = paddingValues.calculateTopPadding(),
+                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + 12.dp,
+                        bottom = paddingValues.calculateBottomPadding() + 78.dp
+                    )
+//                .background(color = colorResource(id = R.color.light_bg_color))
+                    .verticalScroll(rememberScrollState()) // ✅ Enable scrolling
+            ) {
 
-            var notificationsEnabled by remember { mutableStateOf(userData.isNotificationEnabled) }
+                var notificationsEnabled by remember { mutableStateOf(userData.isNotificationEnabled) }
 
-            LaunchedEffect(userData.isNotificationEnabled) {
-                notificationsEnabled = userData.isNotificationEnabled
-            }
+                LaunchedEffect(userData.isNotificationEnabled) {
+                    notificationsEnabled = userData.isNotificationEnabled
+                }
 
-            SettingCard(
-                icon = FontAwesomeIcons.Solid.Bell,
-                title = "Notifications",
-                iconColor = colorResource(id=R.color.charcoal), // Orange
-                trailing = {
-                    Switch(
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = colorResource(id = R.color.dark),
-                            checkedTrackColor = colorResource(id = R.color.dark).copy(alpha = 0.5f),
-                            uncheckedThumbColor = Color.LightGray,
-                            uncheckedTrackColor = Color.Gray
-                        ),
-                        checked = notificationsEnabled,
+                SettingCard(
+                    icon = FontAwesomeIcons.Solid.Bell,
+                    title = "Notifications",
+                    iconColor = colorResource(id = R.color.charcoal), // Orange
+                    trailing = {
+                        Switch(
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = colorResource(id = R.color.dark),
+                                checkedTrackColor = colorResource(id = R.color.dark).copy(alpha = 0.5f),
+                                uncheckedThumbColor = Color.LightGray,
+                                uncheckedTrackColor = Color.Gray
+                            ),
+                            checked = notificationsEnabled,
 //                        onCheckedChange = { enabled ->
 //                            notificationsEnabled = enabled
 //                            notificationPrefsViewModel.saveUserData() // ← call ViewModel function here
 //                        }
 //                        onCheckedChange = { notificationsEnabled = it }
-                        onCheckedChange = { enabled ->
-                            notificationsEnabled = enabled
-                            if (enabled) {
-                                notificationPrefsViewModel.saveUserData()
-                            } else {
-                                notificationPrefsViewModel.clearUserData()
+                            onCheckedChange = { enabled ->
+                                notificationsEnabled = enabled
+                                if (enabled) {
+                                    notificationPrefsViewModel.saveUserData()
+                                } else {
+                                    notificationPrefsViewModel.clearUserData()
+                                }
                             }
-                        }
 
-                    )
-                },
+                        )
+                    },
 //                onClick = { notificationsEnabled = !notificationsEnabled }
 //                onClick = {
 //                    val newValue = !notificationsEnabled
 //                    notificationsEnabled = newValue
 //                    notificationPrefsViewModel.saveUserData() // ← call ViewModel function here
 //                }
-                onClick = {
-                    if (notificationsEnabled) {
-                        // Currently enabled → turn OFF and clear data
-                        notificationsEnabled = false
-                        notificationPrefsViewModel.clearUserData()
-                    } else {
-                        // Currently disabled → turn ON and save data
-                        notificationsEnabled = true
-                        notificationPrefsViewModel.saveUserData()
+                    onClick = {
+                        if (notificationsEnabled) {
+                            // Currently enabled → turn OFF and clear data
+                            notificationsEnabled = false
+                            notificationPrefsViewModel.clearUserData()
+                        } else {
+                            // Currently disabled → turn ON and save data
+                            notificationsEnabled = true
+                            notificationPrefsViewModel.saveUserData()
+                        }
                     }
-                }
 
-            )
-
+                )
 
 
-            SettingCard(
-                icon = FontAwesomeIcons.Solid.InfoCircle,
-                title = "About",
-                iconColor = colorResource(id=R.color.seina), // Green
-                onClick = { /* Navigate */
-                navController.navigate(Screen.CreditAuthor.route)
-                }
-            )
+
+                SettingCard(
+                    icon = FontAwesomeIcons.Solid.InfoCircle,
+                    title = "About",
+                    iconColor = colorResource(id = R.color.seina), // Green
+                    onClick = { /* Navigate */
+                        navController.navigate(Screen.CreditAuthor.route)
+                    }
+                )
 
 
-            SettingCard(
-                icon = FontAwesomeIcons.Solid.Lock,
-                title = "Privacy policy",
-                iconColor = colorResource(id=R.color.persianGreen), // Green
-                onClick = {
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://st11-homy.github.io/EventMarker/privacy-policy.html")
-                    )
-                    context.startActivity(intent)
-                /* Navigate */ }
-            )
+                SettingCard(
+                    icon = FontAwesomeIcons.Solid.Lock,
+                    title = "Privacy policy",
+                    iconColor = colorResource(id = R.color.persianGreen), // Green
+                    onClick = {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://st11-homy.github.io/EventMarker/privacy-policy.html")
+                        )
+                        context.startActivity(intent)
+                        /* Navigate */
+                    }
+                )
 
+            }
         }
     }
 }

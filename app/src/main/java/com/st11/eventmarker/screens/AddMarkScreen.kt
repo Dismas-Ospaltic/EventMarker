@@ -113,7 +113,7 @@ fun AddMarkScreen(navController: NavController) {
 
         // If not granted, show dialog once
         if (!permissionState.value) {
-            delay(2000) // Add delay to prevent flicker
+            delay(1000) // Add delay to prevent flicker
             showPermissionDialog = true
         }
     }

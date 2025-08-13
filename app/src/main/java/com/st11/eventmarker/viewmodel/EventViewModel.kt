@@ -88,4 +88,19 @@ class  EventViewModel(private val eventRepository: EventRepository) : ViewModel(
     }
 
 
+
+
+    private val _eventData = MutableStateFlow<EventEntity?>(null)
+    val eventData: StateFlow<EventEntity?> = _eventData
+
+    fun loadEventById(eventId: String) {
+        viewModelScope.launch {
+            eventRepository.getEventsDetailById(eventId)
+                .collect { eventEntity ->
+                    _eventData.value = eventEntity
+                }
+        }
+    }
+
+
 }

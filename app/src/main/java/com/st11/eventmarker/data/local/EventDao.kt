@@ -26,6 +26,10 @@ interface EventDao {
     @Query("SELECT * FROM events WHERE eventDate >= :formattedDate  ORDER BY timestamp DESC")
     fun getAllUpcomingDateEvents(formattedDate: String): Flow<List<EventEntity>>
 
+
+    @Query("SELECT * FROM events WHERE eventId = :eventId")
+    fun getEventsDetailById(eventId: String): Flow<EventEntity>
+
 //
 //    @Query("SELECT * FROM expenses ORDER BY timestamp DESC")
 //    fun getAllExpenses(): Flow<List<ExpenseEntity>>
