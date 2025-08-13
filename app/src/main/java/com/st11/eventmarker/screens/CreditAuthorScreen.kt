@@ -74,7 +74,7 @@ fun CreditAuthorScreen(navController: NavController) {
             )
 
             Text(
-                text = "Take control of your finances with an easy, powerful tool for tracking daily expenses and planning future goals. Stay organized, focused, and in control.",
+                text = "Stay on top of your schedule with an easy, powerful tool for creating events, setting reminders, and keeping important details at your fingertips. Stay organized, punctual, and prepared for every occasion.",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
@@ -92,18 +92,13 @@ fun CreditAuthorScreen(navController: NavController) {
             )
 
             val iconCredits = listOf(
-//                "App icon designed by zafdesign from Flaticon",
-//                "Analytics icons:",
-//                "- Total Spend icon by Parzival’ 1997",
-//                "- Monthly Expense icon by Freepik",
-//                "- Wishlist icons by nawicon"
-                "App icon was designed by zafdesign from Flaticon",
+//
+                "App icon was designed by Peerapak Takpho from Flaticon",
 
-                "Analytics Screen image icons:",
-                "-Total Spend icon image designed by Parzival’ 1997 from Flaticon",
-                "-Total expenses this month icon image designed by Freepik from Flaticon",
-                "-Total Wishlist icon image designed by nawicon from Flaticon",
-                "-Total Wishlist No. icon image designed by nawicon from Flaticon",
+                "App Screen image icons:",
+                "-No data Placeholder icon image designed by shmai from Flaticon",
+                "-No Search data placeholder icon image designed by kerismaker from Flaticon",
+
             )
 
             iconCredits.forEach { credit ->

@@ -30,6 +30,7 @@ import com.st11.eventmarker.R
 import com.st11.eventmarker.navigation.Screen
 import com.st11.eventmarker.screens.components.SettingCard
 import com.st11.eventmarker.utils.DynamicStatusBar
+import com.st11.eventmarker.viewmodel.NotificationPrefsViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Bell
@@ -49,6 +50,9 @@ fun SettingScreen(navController: NavController) {
     val searchQuery = remember { mutableStateOf("") }
     val backgroundColor = colorResource(id = R.color.seina)
     val context = LocalContext.current
+
+    val notificationPrefsViewModel: NotificationPrefsViewModel = koinViewModel()
+    val userData by notificationPrefsViewModel.userData.collectAsState()
 
     DynamicStatusBar(backgroundColor)
 
@@ -79,7 +83,12 @@ fun SettingScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState()) // ✅ Enable scrolling
         ) {
 
-            var notificationsEnabled by remember { mutableStateOf(true) }
+            var notificationsEnabled by remember { mutableStateOf(userData.isNotificationEnabled) }
+
+            LaunchedEffect(userData.isNotificationEnabled) {
+                notificationsEnabled = userData.isNotificationEnabled
+            }
+
             SettingCard(
                 icon = FontAwesomeIcons.Solid.Bell,
                 title = "Notifications",
@@ -93,10 +102,40 @@ fun SettingScreen(navController: NavController) {
                             uncheckedTrackColor = Color.Gray
                         ),
                         checked = notificationsEnabled,
-                        onCheckedChange = { notificationsEnabled = it }
+//                        onCheckedChange = { enabled ->
+//                            notificationsEnabled = enabled
+//                            notificationPrefsViewModel.saveUserData() // ← call ViewModel function here
+//                        }
+//                        onCheckedChange = { notificationsEnabled = it }
+                        onCheckedChange = { enabled ->
+                            notificationsEnabled = enabled
+                            if (enabled) {
+                                notificationPrefsViewModel.saveUserData()
+                            } else {
+                                notificationPrefsViewModel.clearUserData()
+                            }
+                        }
+
                     )
                 },
-                onClick = { notificationsEnabled = !notificationsEnabled }
+//                onClick = { notificationsEnabled = !notificationsEnabled }
+//                onClick = {
+//                    val newValue = !notificationsEnabled
+//                    notificationsEnabled = newValue
+//                    notificationPrefsViewModel.saveUserData() // ← call ViewModel function here
+//                }
+                onClick = {
+                    if (notificationsEnabled) {
+                        // Currently enabled → turn OFF and clear data
+                        notificationsEnabled = false
+                        notificationPrefsViewModel.clearUserData()
+                    } else {
+                        // Currently disabled → turn ON and save data
+                        notificationsEnabled = true
+                        notificationPrefsViewModel.saveUserData()
+                    }
+                }
+
             )
 
 
@@ -123,9 +162,6 @@ fun SettingScreen(navController: NavController) {
                     context.startActivity(intent)
                 /* Navigate */ }
             )
-
-
-
 
         }
     }

@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +53,7 @@ import com.st11.eventmarker.utils.DatePickerField
 import com.st11.eventmarker.utils.TimePickerField
 import com.st11.eventmarker.utils.addEventToCalendar
 import com.st11.eventmarker.viewmodel.EventViewModel
+import com.st11.eventmarker.viewmodel.NotificationPrefsViewModel
 import com.st11.eventmarker.viewmodel.NotificationViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -97,6 +99,11 @@ fun EditablePopup(
     var selectedDate by remember { mutableStateOf(eventDate) }
     var startTime by remember { mutableStateOf(eventStartTime) }
     var endTime by remember { mutableStateOf(eventEndTime) }
+
+
+    val notificationPrefsViewModel: NotificationPrefsViewModel = koinViewModel()
+    val userData by notificationPrefsViewModel.userData.collectAsState()
+
     val context = LocalContext.current
 
 
@@ -490,44 +497,56 @@ fun EditablePopup(
                                     Toast.makeText(context, "Event saved but calendar permission not granted", Toast.LENGTH_SHORT).show()
                                 }
 
+                                if(userData.isNotificationEnabled) {
+                                    // 2. 🛡️ Now, attempt the risky notification scheduling inside a try-catch block.
+                                    try {
+                                        val (year, month, day) = selectedDate.split("-")
+                                            .map { it.toInt() }
+                                        val (hour, minute) = startTime.split(":").map { it.toInt() }
 
-                                // 2. 🛡️ Now, attempt the risky notification scheduling inside a try-catch block.
-                                try {
-                                    val (year, month, day) = selectedDate.split("-").map { it.toInt() }
-                                    val (hour, minute) = startTime.split(":").map { it.toInt() }
+                                        val dateTime =
+                                            LocalDateTime.of(year, month, day, hour, minute)
 
-                                    val dateTime = LocalDateTime.of(year, month, day, hour, minute)
+                                        val granted =
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                ContextCompat.checkSelfPermission(
+                                                    context,
+                                                    Manifest.permission.POST_NOTIFICATIONS
+                                                ) == PackageManager.PERMISSION_GRANTED
+                                            } else true
 
-                                    val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                        ContextCompat.checkSelfPermission(
-                                            context,
-                                            Manifest.permission.POST_NOTIFICATIONS
-                                        ) == PackageManager.PERMISSION_GRANTED
-                                    } else true
-
-                                    if (granted) {
+                                        if (granted) {
 //                                        viewModel.scheduleEventNotification(context, dateTime, "", eventTitle)
-                                        viewModel.scheduleUserNotification(
-                                            context = context,
-                                            title = "Your upcoming activities! reminder",
-                                            message = "$eventTitle on $selectedDate from $startTime to $endTime at " +
-                                                    (if (eventVenue.isNullOrEmpty()) "Venue not set" else eventVenue) +
-                                                    ". Don't forget!",
-                                            year = year,
-                                            month = month,
-                                            day = day,
-                                            hour = hour,
-                                            minute = minute
+                                            viewModel.scheduleUserNotification(
+                                                context = context,
+                                                title = "Your upcoming activities! reminder",
+                                                message = "$eventTitle on $selectedDate from $startTime to $endTime at " +
+                                                        (if (eventVenue.isNullOrEmpty()) "Venue not set" else eventVenue) +
+                                                        ". Don't forget!",
+                                                year = year,
+                                                month = month,
+                                                day = day,
+                                                hour = hour,
+                                                minute = minute
+                                            )
+
+
+                                        }
+
+                                    } catch (e: Exception) {
+                                        // If parsing fails, log the error instead of crashing!
+                                        Log.e(
+                                            "AddEventScreen",
+                                            "Failed to parse date/time and schedule notification.",
+                                            e
                                         )
-
-
+                                        // Optionally, inform the user with a Toast
+                                        Toast.makeText(
+                                            context,
+                                            "Event saved, but failed to set reminder.",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
-
-                                } catch (e: Exception) {
-                                    // If parsing fails, log the error instead of crashing!
-                                    Log.e("AddEventScreen", "Failed to parse date/time and schedule notification.", e)
-                                    // Optionally, inform the user with a Toast
-                                    Toast.makeText(context, "Event saved, but failed to set reminder.", Toast.LENGTH_LONG).show()
                                 }
 
                         onDismiss()

@@ -1,8 +1,10 @@
 package com.st11.eventmarker.di
 
+import com.st11.eventmarker.data.datastore.NotificationPreferences
 import com.st11.eventmarker.data.local.AppDatabase
 import com.st11.eventmarker.repository.EventRepository
 import com.st11.eventmarker.viewmodel.EventViewModel
+import com.st11.eventmarker.viewmodel.NotificationPrefsViewModel
 import com.st11.eventmarker.viewmodel.NotificationViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -23,6 +25,11 @@ val appModule = module {
 
 
     viewModel { NotificationViewModel() }
+
+
+
+    single { NotificationPreferences(get()) }
+    viewModel { NotificationPrefsViewModel(get()) }
 //
 //
 //

@@ -44,6 +44,7 @@ import com.st11.eventmarker.utils.TimePickerField
 import com.st11.eventmarker.utils.addEventToCalendar
 import com.st11.eventmarker.utils.requestNotificationPermission
 import com.st11.eventmarker.viewmodel.EventViewModel
+import com.st11.eventmarker.viewmodel.NotificationPrefsViewModel
 import com.st11.eventmarker.viewmodel.NotificationViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
@@ -78,6 +79,11 @@ fun AddMarkScreen(navController: NavController) {
     val eventViewModel: EventViewModel = koinViewModel()
 
     val viewModel: NotificationViewModel = koinViewModel()
+
+
+
+    val notificationPrefsViewModel: NotificationPrefsViewModel = koinViewModel()
+    val userData by notificationPrefsViewModel.userData.collectAsState()
 
     val context = LocalContext.current
 
@@ -536,6 +542,8 @@ fun AddMarkScreen(navController: NavController) {
                             Toast.makeText(context, "Event saved but calendar permission not granted", Toast.LENGTH_SHORT).show()
                         }
 
+
+                                if(userData.isNotificationEnabled){
                                 // 2. 🛡️ Now, attempt the risky notification scheduling inside a try-catch block.
                                 try {
                                     val (year, month, day) = selectedDate.split("-").map { it.toInt() }
@@ -574,6 +582,9 @@ fun AddMarkScreen(navController: NavController) {
                                     // Optionally, inform the user with a Toast
                                     Toast.makeText(context, "Event saved, but failed to set reminder.", Toast.LENGTH_LONG).show()
                                 }
+                                }
+
+
 
                                 // 3. ✅ Finally, navigate back.
                                 navController.popBackStack()
