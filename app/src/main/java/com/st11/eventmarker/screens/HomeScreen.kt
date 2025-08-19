@@ -418,7 +418,7 @@ fun HomeScreen(navController: NavController) {
                                PastReminderCard(
                                    priority = eventPriority.toString(),
                                    title = eventTitle.toString(),
-                                   date = "$eventDate $noteDescription $id, $timestamp $eventId $eventCategory",
+                                   date = eventDate,
                                    time = "$eventStartTime - $eventEndTime",
                                    venue = if (eventVenue.isNullOrBlank()) "no venue added" else eventVenue,
                                    onMoreNotesClick = {

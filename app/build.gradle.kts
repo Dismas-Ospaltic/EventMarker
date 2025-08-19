@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.st11.eventmarker"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.st11.eventmarker"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -28,16 +28,31 @@ android {
             )
         }
     }
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_17
+//        targetCompatibility = JavaVersion.VERSION_17
+//    }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+    // ✅ New way
+//    compilerOptions {
+//        jvmTarget.set(JvmTarget.JVM_17)
+//    }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
+//    kotlin {
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.JVM_17)
+//        }
+//    }
     buildFeatures {
         compose = true
     }
+    ndkVersion = "28.2.13676358"
 }
 
 dependencies {
@@ -61,10 +76,10 @@ dependencies {
 
 
 
-    //lottie file animations
-    implementation("com.github.LottieFiles:dotlottie-android:0.5.0")
-
-    implementation("com.airbnb.android:lottie-compose:6.1.0")
+//    //lottie file animations
+//    implementation("com.github.LottieFiles:dotlottie-android:0.5.0")
+//
+//    implementation("com.airbnb.android:lottie-compose:6.1.0")
 
 
     //  this is for Material2 design
@@ -118,6 +133,6 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.25.0")
 
     //for gif display
-    implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation("io.coil-kt:coil-gif:2.4.0") // Important: For GIF support
+//    implementation("io.coil-kt:coil-compose:2.4.0")
+//    implementation("io.coil-kt:coil-gif:2.4.0") // Important: For GIF support
 }

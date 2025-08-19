@@ -15,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,7 +44,8 @@ fun SettingCard(
             .fillMaxWidth()
             .clickable(
                 onClick = onClick,
-                indication = rememberRipple(bounded = true),
+                indication = ripple(bounded = true),
+//                indication = ripple(bounded = true),
                 interactionSource = remember { MutableInteractionSource() }
             )
             .padding(vertical = 4.dp),
