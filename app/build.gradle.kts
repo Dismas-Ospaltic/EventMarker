@@ -13,8 +13,8 @@ android {
         applicationId = "com.st11.eventmarker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -83,7 +83,7 @@ dependencies {
 
 
     //  this is for Material2 design
-    implementation("com.google.android.material:material:1.12.0")
+//    implementation("com.google.android.material:material:1.12.0")
 
     // Koin dependencies for dependency injection
     // Koin Core (required)
@@ -112,10 +112,10 @@ dependencies {
     //pager APi
     implementation("androidx.compose.foundation:foundation:1.7.8") // Use latest version
 
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.2-alpha")
+//    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.2-alpha")
 
     //animation
-    implementation("com.google.accompanist:accompanist-navigation-animation:0.31.2-alpha")
+//    implementation("com.google.accompanist:accompanist-navigation-animation:0.31.2-alpha")
 
 //for Dynamic Status Bar colors
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.2-alpha")
@@ -130,7 +130,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.25.0")
 
     // Accompanist Pager Indicators (for page indicators like dots)
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.25.0")
+//    implementation("com.google.accompanist:accompanist-pager-indicators:0.25.0")
 
     //for gif display
 //    implementation("io.coil-kt:coil-compose:2.4.0")
